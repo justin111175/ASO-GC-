@@ -2,15 +2,16 @@
 #include <array>
 #include <map>
 #include "InputID.h"
-//“ü—Í‘•’u
-enum class conType
-{
-	Key,
-	Mouse,
-	Pad,
-	Max
-};
+#include "conTypeID.h"
 
+//“ü—Í‘•’u
+//enum class conType
+//{
+//	Key,
+//	Mouse,
+//	Pad,
+//	Max
+//};
 enum class Trg
 {
 	Now,

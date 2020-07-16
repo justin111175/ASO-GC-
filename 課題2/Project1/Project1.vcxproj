@@ -150,7 +150,6 @@
     <ClCompile Include="common\Input\KeyInput.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="common\Input\PadInput.cpp" />
-    <ClCompile Include="common\Input\MouseInput.cpp" />
     <ClCompile Include="Puyo.cpp" />
     <ClCompile Include="SceneMng.cpp" />
     <ClCompile Include="State.cpp" />
@@ -158,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="common\detail\Vector2.h" />
+    <ClInclude Include="common\Input\conTypeID.h" />
     <ClInclude Include="common\TimeCount.h" />
     <ClInclude Include="common\Vector2.h" />
     <ClInclude Include="common\_debug\_DeBugConOut.h" />
@@ -166,7 +166,6 @@
     <ClInclude Include="common\Input\KeyInput.h" />
     <ClInclude Include="common\Input\InputID.h" />
     <ClInclude Include="common\Input\PadInput.h" />
-    <ClInclude Include="common\Input\MouseInput.h" />
     <ClInclude Include="Puyo.h" />
     <ClInclude Include="SceneMng.h" />
     <ClInclude Include="State.h" />

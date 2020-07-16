@@ -5,9 +5,6 @@
 #include <vector>
 #include "common/Input/Controller.h"
 
-#define CHIP_SIZE 48
-#define CHIP_MAX_X 6
-#define CHIP_MAX_Y 13
 
 class State
 {
@@ -25,19 +22,17 @@ private:
 	
 	std::map<conType,std::unique_ptr<Controller>> controller;
 	
-	std::unique_ptr<Puyo> _puyo;
+	std::vector<std::unique_ptr<Puyo>> _puyo;
 
-
-
+	const int blockSize_;
+	const Vector2 gridMax;
 	//int mapData[8][14];
 
-	std::vector<int> dataBase;
-	std::vector<int*> data;
+	std::vector<PuyoID> _dataBase;
+	std::vector<PuyoID*> _data;
 
+	bool InstancePuyo(void);
 
-
-	void CtlInit(void);
-	Vector2 _pos;
 
 
 	int screenID;
