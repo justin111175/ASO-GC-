@@ -2,7 +2,7 @@
 #include <Dxlib.h> 
 #include <utility>
 #include "common/_debug/_DeBugConOut.h"
-
+#include "common/TimeCount.h"
 
 
 
@@ -11,6 +11,7 @@ Puyo::Puyo(Vector2&& pos, PuyoID id)
 
 	pos_ = pos;
 	_size = { 48,48 };
+
 	Init();
 }
 
@@ -24,8 +25,29 @@ void Puyo::Draw(Vector2 offset)
 
 }
 
-void Puyo::Run(void)
+bool Puyo::Run(void)
 {
+	//if (_state == PuyoState::—Ž‚¿‚é)
+	//{
+	//	pos_.y++;
+	//}
+	//else
+	//{
+	//	return false;
+	//}
+	_dropCnt++;
+	if (_dropCnt < _dropInt)
+	{
+		return false;
+	}
+	else
+	{
+		pos_.y++;
+		return true;
+	}
+	
+
+
 }
 
 void Puyo::Move(InputID id)
@@ -42,9 +64,10 @@ void Puyo::Move(InputID id)
 			}
 			break;
 		case InputID::Down:
+
 			if (_pData._bit.DOWN)
 			{
-				pos_.y += _size.y;
+				pos_.y += 4;
 
 			}
 
@@ -88,16 +111,34 @@ bool Puyo::_State(PuyoState state)
 
 }
 
+bool Puyo::Pos(Vector2 pos)
+{
+	pos_ = pos;
+	return true;
+}
+
+const bool& Puyo::Alive(void)
+{
+	return _alive;
+}
+
+bool Puyo::Alive(bool flag)
+{
+	return _alive=flag;
+}
+
 const Vector2 Puyo::GetGrid(int size)
 {
 
 	
-	return Vector2{ pos_.x / size,pos_.y / size };
+	return Vector2{ pos_.x / size,(pos_.y) / size };
 }
 
 void Puyo::Init(void)
 {
-
+	_alive = true;
+	_dropCnt = 0;
+	_dropInt = 20;
 	_state = PuyoState::—Ž‚¿‚é;
 }
 

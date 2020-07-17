@@ -1,7 +1,7 @@
 #include "SceneMng.h"
 #include "common/Vector2.h"
 #include "GameScene.h"
-
+#include "common/TimeCount.h"
 
 SceneMng* SceneMng::sInstance = nullptr;
 
@@ -20,7 +20,7 @@ void SceneMng::Run(void)
 	{
 
 		_activeScene = (*_activeScene).Update(std::move(_activeScene));
-
+		_timeCount.Run();
 
 		_frames++;
 		_timeCount.Run();

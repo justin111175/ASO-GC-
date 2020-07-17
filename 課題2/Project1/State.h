@@ -30,10 +30,12 @@ private:
 
 	std::vector<PuyoID> _dataBase;
 	std::vector<PuyoID*> _data;
+	std::vector<PuyoID> _EraserdataBase;
+	std::vector<PuyoID*> _Eraserdata;
 
 	bool InstancePuyo(void);
 
-
+	void SetEraser(void);
 
 	int screenID;
 	void Init(void);

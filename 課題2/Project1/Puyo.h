@@ -43,20 +43,32 @@ public:
 	~Puyo();
 
 	void Draw(Vector2 offset);
-	void Run(void);
+	bool Run(void);
 	void Move(InputID id);
 	bool SetPData(DirBit dirbit);
 	
 	const PuyoState& State(void);
 	bool _State(PuyoState state);
+	
+	bool Pos(Vector2 pos);
+
+	const bool& Alive(void);
+	bool Alive(bool flag);
+
+
+	Permit_Data _pData;
 
 	virtual const Vector2 GetGrid(int size);
 private:
+	bool _alive;
+
+	int _dropCnt;
+	int _dropInt;
+	PuyoState _state;
 	
-	 PuyoState _state;
-	Permit_Data _pData;
 	void Init(void);
 	Vector2 pos_;
 	Vector2 _size;
+
 };
 
