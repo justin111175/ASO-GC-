@@ -8,8 +8,13 @@
 enum class PuyoID
 {
 	NON,
-	Red,
-	Wall,
+	ê‘,
+	óŒ,
+	ê¬,
+	â©,
+	éá,
+
+	ï«,
 	Max
 };
 
@@ -52,6 +57,8 @@ public:
 	
 	bool Pos(Vector2 pos);
 
+	const PuyoID& ID(void);
+
 	const bool& Alive(void);
 	bool Alive(bool flag);
 
@@ -67,8 +74,11 @@ private:
 	PuyoState _state;
 	
 	void Init(void);
+	int color_;
 	Vector2 pos_;
 	Vector2 _size;
+
+	PuyoID id_;
 
 };
 

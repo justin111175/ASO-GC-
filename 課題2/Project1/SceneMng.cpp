@@ -2,6 +2,7 @@
 #include "common/Vector2.h"
 #include "GameScene.h"
 #include "common/TimeCount.h"
+#include <time.h>
 
 SceneMng* SceneMng::sInstance = nullptr;
 
@@ -46,6 +47,7 @@ bool SceneMng::SysInit(void)
 		return false;
 	}
 
+	srand((unsigned)time(NULL));										// ŠÔ‚©‚ç—”¶¬
 
 	return true;
 

@@ -11,7 +11,7 @@ Puyo::Puyo(Vector2&& pos, PuyoID id)
 
 	pos_ = pos;
 	_size = { 48,48 };
-
+	id_ = id;
 	Init();
 }
 
@@ -21,7 +21,7 @@ Puyo::~Puyo()
 
 void Puyo::Draw(Vector2 offset)
 {
-	DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, 0xAA0000, true);
+	DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, color_, true);
 
 }
 
@@ -117,6 +117,11 @@ bool Puyo::Pos(Vector2 pos)
 	return true;
 }
 
+const PuyoID& Puyo::ID(void)
+{
+	return id_;
+}
+
 const bool& Puyo::Alive(void)
 {
 	return _alive;
@@ -140,6 +145,30 @@ void Puyo::Init(void)
 	_dropCnt = 0;
 	_dropInt = 20;
 	_state = PuyoState::óéÇøÇÈ;
+
+	switch (id_)
+	{
+	case PuyoID::ê‘:
+		color_ = 0xFF0000;
+		break;
+	case PuyoID::óŒ:
+		color_ = 0x00FF00;
+		break;
+	case PuyoID::ê¬:
+		color_ = 0x0000FF;
+		break;
+	case PuyoID::â©:
+		color_ = 0xFFFF00;
+		break;
+	case PuyoID::éá:
+		color_ = 0xFF00FF;
+		break;
+	default:
+		break;
+	}
+
+
+
 }
 
 

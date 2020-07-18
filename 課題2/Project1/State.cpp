@@ -6,6 +6,7 @@
 #include "common/_debug/_DeBugConOut.h"
 #include "SceneMng.h"
 #include <functional>
+#include <type_traits>
 
 int State::_stateCount = 0;
 State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
@@ -21,7 +22,8 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,0 };
 
-	_puyo.emplace(_puyo.begin(), std::make_unique<Puyo>(std::move(pos_), PuyoID::Red));
+	int id= (rand() % (static_cast<int>(PuyoID::Max)-2)+1);
+	_puyo.emplace(_puyo.begin(), std::make_unique<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 	Init();
 
 }
@@ -50,14 +52,14 @@ void State::Draw(void)
 	for (int i = 0; i < (__int64)gridMax.x * gridMax.y; i++)
 	{
 
-		if (_dataBase[i] == PuyoID::Wall)
+		if (_dataBase[i] == PuyoID::•Ç)
 		{
 			DrawBox(_offset.x + (i % gridMax.x) * blockSize_, _offset.y + (i / gridMax.x) * blockSize_,
 				_offset.x + (1 + (i % gridMax.x)) * blockSize_, _offset.y + (1 + (i / gridMax.x)) * blockSize_, 0xFFFFFF, true);
 
 		}
 
-		if (_EraserdataBase[i] == PuyoID::Red)
+		if (_EraserdataBase[i] != PuyoID::NON)
 		{
 			DrawBox(_offset.x + (i % gridMax.x) * blockSize_, _offset.y + (i / gridMax.x) * blockSize_,
 				_offset.x + (1 + (i % gridMax.x)) * blockSize_, _offset.y + (1 + (i / gridMax.x)) * blockSize_, 0xFF00FF, true);
@@ -151,7 +153,7 @@ void State::Run(void)
 	}
 	else
 	{
-		_data[pos.y][pos.x] = PuyoID::Red;
+		_data[pos.y][pos.x] = _puyo[0]->ID();
 		SetEraser();
 		InstancePuyo();
 	}
@@ -184,7 +186,7 @@ void State::Run(void)
 	//			if (_data[pos.y + 1][pos.x] != PuyoID::NON)
 	//			{
 	//				_pData._bit.DOWN = 0;
-	//				_data[pos.y][pos.x] = PuyoID::Red;
+	//				_data[pos.y][pos.x] = PuyoID::Ô;
 
 	//			}
 	//			puyo->SetPData(_pData._bit);
@@ -221,8 +223,8 @@ void State::Run(void)
 bool State::InstancePuyo(void)
 {
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,0 };
-
-	_puyo.emplace(_puyo.begin(), std::make_unique<Puyo>(std::move(pos_), PuyoID::Red));
+	int id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
+	_puyo.emplace(_puyo.begin(), std::make_unique<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 
 
 	return true;
@@ -235,6 +237,7 @@ void State::SetEraser(void)
 	memset(_EraserdataBase.data(), 0, _EraserdataBase.size() * sizeof(PuyoID));
 
 	auto pos = _puyo[0]->GetGrid(blockSize_);
+	auto id = _puyo[0]->ID();
 	int count = 0;
 
 	std::function<void(PuyoID id, Vector2 vec)> DirCheck = [&](PuyoID id, Vector2 vec) {
@@ -255,7 +258,7 @@ void State::SetEraser(void)
 	};
 
 
-	DirCheck(PuyoID::Red, pos);
+	DirCheck(id, pos);
 
 
 	if (count < 4)
@@ -327,9 +330,9 @@ void State::Init(void)
 		{
 			_data[y][x] = PuyoID::NON;
 
-			_data[(__int64)gridMax.y-1][x] = PuyoID::Wall;
-			_data[y][0] = PuyoID::Wall;
-			_data[y][gridMax.x-1] = PuyoID::Wall;
+			_data[(__int64)gridMax.y-1][x] = PuyoID::•Ç;
+			_data[y][0] = PuyoID::•Ç;
+			_data[y][gridMax.x-1] = PuyoID::•Ç;
 		}
 	}
 	//dataBase[0] = 100;
