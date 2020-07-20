@@ -24,7 +24,6 @@ void SceneMng::Run(void)
 		_timeCount.Run();
 
 		_frames++;
-		_timeCount.Run();
 	}
 
 }

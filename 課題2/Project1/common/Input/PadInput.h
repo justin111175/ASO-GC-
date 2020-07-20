@@ -18,8 +18,6 @@ private:
 
 	std::map<InputID, int> _inputTbl;
 
-
-
 };
 
 

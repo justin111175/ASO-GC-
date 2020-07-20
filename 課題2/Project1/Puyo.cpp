@@ -27,17 +27,10 @@ void Puyo::Draw(Vector2 offset)
 
 bool Puyo::Run(void)
 {
-	//if (_state == PuyoState::—Ž‚¿‚é)
-	//{
-	//	pos_.y++;
-	//}
-	//else
-	//{
-	//	return false;
-	//}
-	_dropCnt++;
+
 	if (_dropCnt < _dropInt)
 	{
+		_dropCnt++;
 		return false;
 	}
 	else
@@ -109,6 +102,11 @@ bool Puyo::_State(PuyoState state)
 	_state = state;
 	return true;
 
+}
+
+const Vector2& Puyo::Pos(void)
+{
+	return pos_;
 }
 
 bool Puyo::Pos(Vector2 pos)

@@ -55,6 +55,7 @@ public:
 	const PuyoState& State(void);
 	bool _State(PuyoState state);
 	
+	const Vector2& Pos(void);
 	bool Pos(Vector2 pos);
 
 	const PuyoID& ID(void);

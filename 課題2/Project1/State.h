@@ -5,6 +5,13 @@
 #include <vector>
 #include "common/Input/Controller.h"
 
+enum class PuyoMode
+{
+	óéâ∫,
+	òAçΩ,
+	MAX
+};
+
 
 class State
 {
@@ -18,8 +25,16 @@ public:
 	
 
 private:
+	PuyoMode puyomode_;
 	
-	
+	void playerCtl(void);
+	void downCheck(void);
+	bool SetEraser(PuyoID id, Vector2 pos);
+	bool rennsaFlag;
+
+	Permit_Data _pData;
+
+
 	std::map<conType,std::unique_ptr<Controller>> controller;
 	
 	std::vector<std::unique_ptr<Puyo>> _puyo;
@@ -35,7 +50,6 @@ private:
 
 	bool InstancePuyo(void);
 
-	void SetEraser(void);
 
 	int screenID;
 	void Init(void);
