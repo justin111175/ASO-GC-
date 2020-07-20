@@ -110,128 +110,27 @@ void State::Run(void)
 		return true;
 	};
 
-	//if (puyomode_ == PuyoMode::—Ž‰º)
-	//{
-	//	playerCtl();
-
-	//	rennsaFlag = false;
-	//	if (rennsaFlag)
-	//	{
-	//		if (_puyo[0]->Run())
-	//		{			
-
-	//			downCheck();
-	//			//rennsaFlag = false;
-
-	//		}
-
-	//	}
-	//	else
-	//	{
-	//		auto pos = _puyo[0]->GetGrid(blockSize_);
-	//		auto id = _puyo[0]->ID();
-
-	//		_data[pos.y][pos.x] = _puyo[0]->ID();
-	//		//if (SetEraser(id, pos))
-	//		//{
-
-	//		//	if (test())
-	//		//	{
-	//		//		puyomode_ = PuyoMode::˜A½;
-	//		//		_timeCount.Set("—Ž‚¿‚é", true, 2.5);
-	//		//		return;
-	//		//	}
-
-
-	//		//}
-
-	//		InstancePuyo();
-	//	}
-
-
-
-	//}
-	//else
-	//{
-
-	//	for (auto&& puyo : _puyo)
-	//	{
-
-	//		if (puyo->State() == PuyoState::—Ž‚¿‚é)
-	//		{
-
-
-	//			if (puyo->Run())
-	//			{
-	//				downCheck();
-	//				//{
-	//				//	rennsaFlag = true;
-
-	//				//}
-	//			}
-
-
-	//		}
-	//		else
-	//		{
-
-	//			auto pos = puyo->GetGrid(blockSize_);
-	//			auto id = puyo->ID();
-
-	//			//if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::NON)
-	//			//{
-	//			_data[pos.y][pos.x] = puyo->ID();
-	//			//SetEraser(id, pos);
-
-	//		//}
-	//		//if (SetEraser(id, pos))
-	//		//{
-
-	//		//}
-	//		//if (!_timeCount.GetFlag("—Ž‚¿‚é"))
-	//		//{
-	//		//	puyomode_ = PuyoMode::—Ž‰º;
-	//		//}
-
-
-
-
-	//		}
-
-
-
-	//	}
-
-
-
-
-
-
-	//}
-		
-
-	if(puyomode_ == PuyoMode::—Ž‰º)
+	if (puyomode_ == PuyoMode::—Ž‰º)
 	{
 		playerCtl();
 
-		auto pos = _puyo[0]->GetGrid(blockSize_);
-		auto id = _puyo[0]->ID();
 		if (_puyo[0]->State() == PuyoState::—Ž‚¿‚é)
 		{
-
 			if (_puyo[0]->Run())
-			{
+			{			
 				downCheck();
 
 			}
-		
+
 		}
 		else
 		{
-			_data[pos.y][pos.x] = _puyo[0]->ID();
-			if (SetEraser(id,pos))
-			{
+			auto pos = _puyo[0]->GetGrid(blockSize_);
+			auto id = _puyo[0]->ID();
 
+			_data[pos.y][pos.x] = _puyo[0]->ID();
+			if (SetEraser(id, pos))
+			{
 				if (test())
 				{
 					puyomode_ = PuyoMode::˜A½;
@@ -239,103 +138,58 @@ void State::Run(void)
 					return;
 				}
 
-				
+
 			}
 
 			InstancePuyo();
 		}
 
-
-
 	}
 	else
 	{
-		
+
 		for (auto&& puyo : _puyo)
-		{				
+		{
 
 			if (puyo->State() == PuyoState::—Ž‚¿‚é)
 			{
-				
+
 
 				if (puyo->Run())
 				{
 					downCheck();
-					//{
-					//	rennsaFlag = true;
 
-					//}
 				}
 
-				
+
 			}
 			else
-			{			
+			{
 
 				auto pos = puyo->GetGrid(blockSize_);
 				auto id = puyo->ID();
 
 				_data[pos.y][pos.x] = puyo->ID();
+				//SetEraser(id, pos);
+
 
 				if (!_timeCount.GetFlag("—Ž‚¿‚é"))
 				{
 					puyomode_ = PuyoMode::—Ž‰º;
 				}
 
-
-
-
 			}
 
-
-
 		}
-		
-
-
-		
 
 
 	}
+		
 
 
 
 
 
-
-
-
-
-	//for (auto data : controller[conType::Pad]->GetCntData(_id))
-	//{
-	//	if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-	//	{
-	//		for (auto&& puyo : _puyo)
-	//		{
-	//			auto pos = puyo->GetGrid(blockSize_);
-
-
-	//			if (_data[pos.y][pos.x + 1] != PuyoID::NON)
-	//			{
-	//				_pData._bit.RIGHT = 0;
-	//			}
-	//			if (_data[pos.y][pos.x - 1] != PuyoID::NON)
-	//			{
-	//				_pData._bit.LEFT = 0;
-	//			}
-	//			if (_data[pos.y + 1][pos.x] != PuyoID::NON)
-	//			{
-	//				_pData._bit.DOWN = 0;
-	//				_data[pos.y][pos.x] = PuyoID::Ô;
-
-	//			}
-	//			puyo->SetPData(_pData._bit);
-	//			puyo->Move(data.first);
-
-
-	//		}
-	//	}
-	//}
 
 	(*controller[conType::Key])();
 
@@ -345,11 +199,6 @@ void State::Run(void)
 void State::playerCtl(void)
 {
 	_pData._bit = { 1,1,1,1 };
-
-	//_puyo[0]->_State(PuyoState::—Ž‚¿‚é);
-
-
-
 
 
 	for (auto data : controller[conType::Key]->GetCntData())
@@ -395,7 +244,31 @@ void State::playerCtl(void)
 
 
 	}
-
+		//for (auto data : controller[conType::Pad]->GetCntData(_id))
+		//{
+		//	if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+		//	{
+		//		for (auto&& puyo : _puyo)
+		//		{
+		//			auto pos = puyo->GetGrid(blockSize_);
+		//			if (_data[pos.y][pos.x + 1] != PuyoID::NON)
+		//			{
+		//				_pData._bit.RIGHT = 0;
+		//			}
+		//			if (_data[pos.y][pos.x - 1] != PuyoID::NON)
+		//			{
+		//				_pData._bit.LEFT = 0;
+		//			}
+		//			if (_data[pos.y + 1][pos.x] != PuyoID::NON)
+		//			{
+		//				_pData._bit.DOWN = 0;
+		//				_data[pos.y][pos.x] = PuyoID::Ô;
+		//			}
+		//			puyo->SetPData(_pData._bit);
+		//			puyo->Move(data.first);
+		//		}
+		//	}
+		//}
 
 
 }
