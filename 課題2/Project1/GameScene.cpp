@@ -10,7 +10,7 @@ GameScene::GameScene()
 
 
 	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(0, 0)), std::move(Vector2(1280, 800))/*,PlayerCtl::Player_1*/));
-//	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(600, 0)), std::move(Vector2(1280, 800))/*,PlayerCtl::Player_1*/));
+	//playerState.emplace_back(std::make_unique<State>(std::move (Vector2(600, 0)), std::move(Vector2(1280, 800))/*,PlayerCtl::Player_1*/));
 
 
 }

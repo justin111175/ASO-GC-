@@ -20,7 +20,7 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	State::_offset =std::move(_offset);
 	State::_size = std::move(_size);
 
-	Vector2 pos_ = { gridMax.x / 2 * blockSize_,0 };
+	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 
 	int id= (rand() % (static_cast<int>(PuyoID::Max)-2)+1);
 	_puyo.emplace(_puyo.begin(), std::make_unique<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
@@ -100,98 +100,57 @@ void State::Run(void)
 
 		});
 
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [](std::unique_ptr<Puyo>& obj) {
 
-
-			return obj->_State(PuyoState::—Ž‚¿‚é);
-
-		});
 
 		return true;
 	};
 
-	if (puyomode_ == PuyoMode::—Ž‰º)
+	bool nextFlag = true;
+	std::for_each(_puyo.rbegin(), _puyo.rend(), [&](std::unique_ptr<Puyo>& puyo) {
+
+
+		return nextFlag &= downCheck(puyo);
+
+	});
+
+	playerCtl();
+
+	if (!nextFlag)
 	{
-		playerCtl();
+		bool rennsaFlag = true;
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](std::unique_ptr<Puyo>& puyo) {
 
-		if (_puyo[0]->State() == PuyoState::—Ž‚¿‚é)
-		{
-			if (_puyo[0]->Run())
-			{			
-				downCheck();
+			auto pos = puyo->GetGrid(blockSize_);
+			auto id = puyo->ID();
 
-			}
-
-		}
-		else
-		{
-			auto pos = _puyo[0]->GetGrid(blockSize_);
-			auto id = _puyo[0]->ID();
-
-			_data[pos.y][pos.x] = _puyo[0]->ID();
-			if (SetEraser(id, pos))
+			if (!puyo->Run())
 			{
-				if (test())
+				rennsaFlag = false;
+			}
+			if (rennsaFlag)
+			{
+				if (SetEraser(id, pos))
 				{
-					puyomode_ = PuyoMode::˜A½;
-					_timeCount.Set("—Ž‚¿‚é", true, 2.5);
-					return;
+					test();
 				}
 
-
 			}
 
-			InstancePuyo();
-		}
+		});
 
+		delPuyo();
+
+
+			
 	}
 	else
 	{
-
-		for (auto&& puyo : _puyo)
+		//if (rennsaFlag)
 		{
-
-			if (puyo->State() == PuyoState::—Ž‚¿‚é)
-			{
-
-
-				if (puyo->Run())
-				{
-					downCheck();
-
-				}
-
-
-			}
-			else
-			{
-
-				auto pos = puyo->GetGrid(blockSize_);
-				auto id = puyo->ID();
-
-				_data[pos.y][pos.x] = puyo->ID();
-				//SetEraser(id, pos);
-
-
-				if (!_timeCount.GetFlag("—Ž‚¿‚é"))
-				{
-					puyomode_ = PuyoMode::—Ž‰º;
-				}
-
-			}
+			InstancePuyo();
 
 		}
-
-
 	}
-		
-
-
-
-
-
-
-	(*controller[conType::Key])();
 
 
 }
@@ -200,6 +159,8 @@ void State::playerCtl(void)
 {
 	_pData._bit = { 1,1,1,1 };
 
+
+	(*controller[conType::Key])();
 
 	for (auto data : controller[conType::Key]->GetCntData())
 	{
@@ -241,66 +202,84 @@ void State::playerCtl(void)
 
 			}
 		}
-
-
 	}
-		//for (auto data : controller[conType::Pad]->GetCntData(_id))
-		//{
-		//	if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-		//	{
-		//		for (auto&& puyo : _puyo)
-		//		{
-		//			auto pos = puyo->GetGrid(blockSize_);
-		//			if (_data[pos.y][pos.x + 1] != PuyoID::NON)
-		//			{
-		//				_pData._bit.RIGHT = 0;
-		//			}
-		//			if (_data[pos.y][pos.x - 1] != PuyoID::NON)
-		//			{
-		//				_pData._bit.LEFT = 0;
-		//			}
-		//			if (_data[pos.y + 1][pos.x] != PuyoID::NON)
-		//			{
-		//				_pData._bit.DOWN = 0;
-		//				_data[pos.y][pos.x] = PuyoID::Ô;
-		//			}
-		//			puyo->SetPData(_pData._bit);
-		//			puyo->Move(data.first);
-		//		}
-		//	}
-		//}
 
+	(*controller[conType::Pad])();
+
+	for (auto data : controller[conType::Pad]->GetCntData(_id))
+	{
+		if (data.first != InputID::Down)
+		{
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+				auto pos = _puyo[0]->GetGrid(blockSize_);
+				if (_data[pos.y][pos.x + 1] != PuyoID::NON)
+				{
+					_pData._bit.RIGHT = 0;
+				}
+				if (_data[pos.y][pos.x - 1] != PuyoID::NON)
+				{
+					_pData._bit.LEFT = 0;
+				}
+
+				_puyo[0]->SetPData(_pData._bit);
+				_puyo[0]->Move(data.first);
+			}
+		}
+		else
+		{
+			if (data.second[static_cast<int>(Trg::Now)])
+			{
+				auto pos = _puyo[0]->GetGrid(blockSize_);
+
+				if (_data[(_int64)pos.y + 1][pos.x] != PuyoID::NON)
+				{
+					_pData._bit.DOWN = 0;
+					_puyo[0]->_State(PuyoState::Ž~‚Ü‚é);
+					break;
+				}
+
+				_puyo[0]->SetPData(_pData._bit);
+
+				_puyo[0]->Move(data.first);
+
+			}
+		}
+	}
 
 }
 
-void State::downCheck(void)
+bool State::downCheck(std::unique_ptr<Puyo>& puyo)
 {
-	for (auto&& puyo : _puyo)
+	bool flag = true;
+
+	auto pos = puyo->GetGrid(blockSize_);
+
+	if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::NON)
 	{
-		auto pos = puyo->GetGrid(blockSize_);
 
-		if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::NON)
-		{
+		puyo->Pos(pos * blockSize_);
+		_pData._bit.DOWN = 0;
+		//puyo->_State(PuyoState::Ž~‚Ü‚é);
+		_data[pos.y][pos.x] = puyo->ID();
 
-			puyo->Pos(pos * blockSize_);
-			_pData._bit.DOWN = 0;
-			puyo->_State(PuyoState::Ž~‚Ü‚é);
-			//rennsaFlag = false;
-			
-		}
-		//else
-		//{
-		//	rennsaFlag = true;
-		//}
+	}
+	else
+	{
+		flag = false;
+		//_data[pos.y][pos.x] = puyo->ID();
+
 	}
 
-	//return false;
+	
+
+	return flag;
 	
 }
 
 bool State::InstancePuyo(void)
 {
-	Vector2 pos_ = { gridMax.x / 2 * blockSize_,0 };
+	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 	int id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_unique<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 
@@ -333,38 +312,11 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 
 	};
 
-	//if (puyomode_ == PuyoMode::—Ž‰º)
-	//{
-
-		DirCheck(id, pos);
-
-//	}
-	
-	//if(puyomode_ == PuyoMode::˜A½)
-	//{
-	//	auto pos = _puyo[0]->GetGrid(blockSize_);
-	//	auto id = _puyo[0]->ID();
-
-	////	for (auto &&puyo:_puyo)
-	////	{
-	////		auto pos = puyo->GetGrid(blockSize_);
-	////		auto id = puyo->ID();
-
-	//		DirCheck(id, pos+1);
-
-	////	}
-
-	////	
-
-	//}
-
-	
-
+	DirCheck(id, pos);
 
 	if (count < 4)
 	{
-		return false;
-
+		memset(_EraserdataBase.data(), 0, _EraserdataBase.size() * sizeof(PuyoID));
 	}
 	else
 	{
@@ -379,20 +331,22 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 			}
 		}
 
-		_puyo.erase(std::remove_if(
-			_puyo.begin(),
-			_puyo.end(),
-			[](std::unique_ptr<Puyo>& obj) {return !(obj)->Alive(); }), _puyo.end());
-
-
-		memset(_EraserdataBase.data(), 0, _EraserdataBase.size() * sizeof(PuyoID));
 		return true;
 	}
+	return false;
 
 
 
 
+}
 
+void State::delPuyo(void)
+{
+
+	_puyo.erase(std::remove_if(
+		_puyo.begin(),
+		_puyo.end(),
+		[](std::unique_ptr<Puyo>& obj) {return !(obj)->Alive(); }), _puyo.end());
 
 
 }
@@ -403,7 +357,6 @@ void State::Init(void)
 {
 
 	_color = 0x000033<<(16*_id);
-	puyomode_ = PuyoMode::—Ž‰º;
 	//controller = std::make_unique<KeyInput>();
 	
 	controller.try_emplace(conType::Key, std::make_unique<KeyInput>());
@@ -436,8 +389,9 @@ void State::Init(void)
 	{
 		for (int y = 0; y < gridMax.y; y++)
 		{
-			_data[y][x] = PuyoID::NON;
 
+			_data[y][x] = PuyoID::NON;
+			_data[0][x] = PuyoID::•Ç;
 			_data[(__int64)gridMax.y-1][x] = PuyoID::•Ç;
 			_data[y][0] = PuyoID::•Ç;
 			_data[y][gridMax.x-1] = PuyoID::•Ç;

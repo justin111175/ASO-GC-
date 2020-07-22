@@ -28,10 +28,9 @@ private:
 	PuyoMode puyomode_;
 	
 	void playerCtl(void);
-	void downCheck(void);
+	bool downCheck(std::unique_ptr<Puyo>& puyo);
 	bool SetEraser(PuyoID id, Vector2 pos);
-	bool rennsaFlag;
-
+	void delPuyo(void);
 	Permit_Data _pData;
 
 
