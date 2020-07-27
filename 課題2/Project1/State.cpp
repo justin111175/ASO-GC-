@@ -23,7 +23,7 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 
 	int id= (rand() % (static_cast<int>(PuyoID::Max)-2)+1);
-	_puyo.emplace(_puyo.begin(), std::make_unique<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
+	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 	Init();
 
 }
@@ -92,7 +92,7 @@ void State::Run(void)
 {
 	auto test = [&]() {
 		
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](std::unique_ptr<Puyo>& obj) {
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& obj) {
 
 			auto pos = obj->GetGrid(blockSize_);
 
@@ -106,7 +106,7 @@ void State::Run(void)
 	};
 
 	bool nextFlag = true;
-	std::for_each(_puyo.rbegin(), _puyo.rend(), [&](std::unique_ptr<Puyo>& puyo) {
+	std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
 
 
 		return nextFlag &= downCheck(puyo);
@@ -118,7 +118,7 @@ void State::Run(void)
 	if (!nextFlag)
 	{
 		bool rennsaFlag = true;
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](std::unique_ptr<Puyo>& puyo) {
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
 
 			auto pos = puyo->GetGrid(blockSize_);
 			auto id = puyo->ID();
@@ -249,7 +249,7 @@ void State::playerCtl(void)
 
 }
 
-bool State::downCheck(std::unique_ptr<Puyo>& puyo)
+bool State::downCheck(sharedPuyo& puyo)
 {
 	bool flag = true;
 
@@ -281,7 +281,7 @@ bool State::InstancePuyo(void)
 {
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 	int id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
-	_puyo.emplace(_puyo.begin(), std::make_unique<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
+	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 
 
 	return true;
@@ -346,7 +346,7 @@ void State::delPuyo(void)
 	_puyo.erase(std::remove_if(
 		_puyo.begin(),
 		_puyo.end(),
-		[](std::unique_ptr<Puyo>& obj) {return !(obj)->Alive(); }), _puyo.end());
+		[](sharedPuyo& obj) {return !(obj)->Alive(); }), _puyo.end());
 
 
 }
@@ -395,6 +395,14 @@ void State::Init(void)
 			_data[(__int64)gridMax.y-1][x] = PuyoID::•Ç;
 			_data[y][0] = PuyoID::•Ç;
 			_data[y][gridMax.x-1] = PuyoID::•Ç;
+
+
+			//_data[y][x].reset();
+			//_data[0][x](PuyoID::•Ç);
+			//_d
+			//_data[(__int64)gridMax.y - 1][x] = PuyoID::•Ç;
+			//_data[y][0] = PuyoID::•Ç;
+			//_data[y][gridMax.x - 1] = PuyoID::•Ç;
 		}
 	}
 	//dataBase[0] = 100;

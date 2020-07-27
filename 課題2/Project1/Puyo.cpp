@@ -120,6 +120,9 @@ const PuyoID& Puyo::ID(void)
 	return id_;
 }
 
+
+
+
 const bool& Puyo::Alive(void)
 {
 	return _alive;

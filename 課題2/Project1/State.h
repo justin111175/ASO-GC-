@@ -12,6 +12,7 @@ enum class PuyoMode
 	MAX
 };
 
+using sharedPuyo = std::shared_ptr<Puyo>;
 
 class State
 {
@@ -28,7 +29,7 @@ private:
 	PuyoMode puyomode_;
 	
 	void playerCtl(void);
-	bool downCheck(std::unique_ptr<Puyo>& puyo);
+	bool downCheck(sharedPuyo& puyo);
 	bool SetEraser(PuyoID id, Vector2 pos);
 	void delPuyo(void);
 	Permit_Data _pData;
@@ -36,7 +37,7 @@ private:
 
 	std::map<conType,std::unique_ptr<Controller>> controller;
 	
-	std::vector<std::unique_ptr<Puyo>> _puyo;
+	std::vector<sharedPuyo> _puyo;
 
 	const int blockSize_;
 	const Vector2 gridMax;
