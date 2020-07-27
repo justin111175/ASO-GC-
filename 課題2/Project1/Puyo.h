@@ -63,11 +63,13 @@ public:
 	const bool& Alive(void);
 	bool Alive(bool flag);
 
+	void puyo(double no);
 
 	Permit_Data _pData;
 
 	virtual const Vector2 GetGrid(int size);
 private:
+	double _cnt;
 	bool _alive;
 
 	int _dropCnt;

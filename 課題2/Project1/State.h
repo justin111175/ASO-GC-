@@ -9,6 +9,8 @@ enum class PuyoMode
 {
 	—‰º,
 	˜A½,
+	˜A½—‰º,
+	‚Õ‚æ,
 	MAX
 };
 
@@ -37,6 +39,9 @@ private:
 
 	std::map<conType,std::unique_ptr<Controller>> controller;
 	
+	
+	std::map<PuyoMode,std::function<void(void)>> test;
+	
 	std::vector<sharedPuyo> _puyo;
 
 	const int blockSize_;
@@ -45,11 +50,13 @@ private:
 
 	std::vector<PuyoID> _dataBase;
 	std::vector<PuyoID*> _data;
+
 	std::vector<PuyoID> _EraserdataBase;
 	std::vector<PuyoID*> _Eraserdata;
 
 	bool InstancePuyo(void);
 
+	int _cnt;
 
 	int screenID;
 	void Init(void);

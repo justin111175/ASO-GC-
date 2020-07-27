@@ -90,67 +90,12 @@ void State::Draw(void)
 
 void State::Run(void)
 {
-	auto test = [&]() {
-		
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& obj) {
-
-			auto pos = obj->GetGrid(blockSize_);
-
-			return _data[pos.y][pos.x] = PuyoID::NON;
-
-		});
 
 
 
-		return true;
-	};
-
-	bool nextFlag = true;
-	std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+	test[puyomode_]();
 
 
-		return nextFlag &= downCheck(puyo);
-
-	});
-
-	playerCtl();
-
-	if (!nextFlag)
-	{
-		bool rennsaFlag = true;
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
-
-			auto pos = puyo->GetGrid(blockSize_);
-			auto id = puyo->ID();
-
-			if (!puyo->Run())
-			{
-				rennsaFlag = false;
-			}
-			if (rennsaFlag)
-			{
-				if (SetEraser(id, pos))
-				{
-					test();
-				}
-
-			}
-
-		});
-
-		delPuyo();
-
-
-			
-	}
-	else
-	{
-		//if (rennsaFlag)
-		{
-			InstancePuyo();
-
-		}
-	}
 
 
 }
@@ -317,6 +262,8 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 	if (count < 4)
 	{
 		memset(_EraserdataBase.data(), 0, _EraserdataBase.size() * sizeof(PuyoID));
+		return false;
+
 	}
 	else
 	{
@@ -329,11 +276,11 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 				puyo->Alive(false);
 
 			}
+
 		}
 
 		return true;
 	}
-	return false;
 
 
 
@@ -356,6 +303,10 @@ void State::delPuyo(void)
 void State::Init(void)
 {
 
+
+
+
+
 	_color = 0x000033<<(16*_id);
 	//controller = std::make_unique<KeyInput>();
 	
@@ -366,6 +317,153 @@ void State::Init(void)
 
 	controller[conType::Key]->SetUp(_id);
 	controller[conType::Pad]->SetUp(_id);
+
+
+	test.try_emplace(PuyoMode::落下, [&]() {
+		playerCtl();
+
+		bool nextFlag = true;
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+			//for (auto&& puyo : _puyo)
+			{
+				puyo->Run();
+
+			}
+			return nextFlag &= downCheck(puyo);
+
+		});
+		
+		if (nextFlag)
+		{
+			_cnt = 0;
+			puyomode_ = PuyoMode::ぷよ;
+	
+			//InstancePuyo();
+		}
+
+
+
+	});
+	
+	
+
+	test.try_emplace(PuyoMode::連鎖, [&]() {
+
+
+			//bool nextFlag = true;
+			
+			//std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+			//	return nextFlag &= downCheck(puyo);
+
+
+
+			//});
+
+			bool rennsaFlag = true;
+			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+				return rennsaFlag &= downCheck(puyo);
+
+
+
+			});
+			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+
+				auto pos = puyo->GetGrid(blockSize_);
+				auto id = puyo->ID();
+				if (!puyo->Run())
+				{
+					rennsaFlag = false;
+				}
+				if (rennsaFlag)
+				{
+					if (SetEraser(id, pos))
+					{
+						std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+							auto pos = puyo->GetGrid(blockSize_);
+
+							_data[pos.y][pos.x] = PuyoID::NON;
+
+						});
+					}
+
+				}
+
+			
+
+			});
+			delPuyo();
+	
+			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+				return rennsaFlag &= downCheck(puyo);
+
+
+
+			});
+
+
+			TRACE("%d\n", rennsaFlag);
+
+			if (rennsaFlag)
+			{
+				_cnt = 0;
+				
+
+				InstancePuyo();
+				puyomode_ = PuyoMode::落下;
+
+			}
+			else
+			{
+				puyomode_ = PuyoMode::連鎖落下;
+			}
+
+
+			
+
+
+
+
+
+		
+	
+	});
+
+	test.try_emplace(PuyoMode::連鎖落下, [&]() {
+	
+		puyomode_ = PuyoMode::連鎖;
+	
+	
+	});
+
+	test.try_emplace(PuyoMode::ぷよ, [&]() {
+	
+		if (_cnt <= 60)
+		{
+			_cnt+=2;
+			for (auto&& puyo : _puyo)
+			{
+				puyo->puyo(sin(_cnt / 10.0));
+			}
+		}
+		else
+		{
+			_cnt = 0;
+			puyomode_ = PuyoMode::連鎖;
+		}
+
+
+	
+
+
+	
+	
+	});
 
 
 
@@ -389,7 +487,6 @@ void State::Init(void)
 	{
 		for (int y = 0; y < gridMax.y; y++)
 		{
-
 			_data[y][x] = PuyoID::NON;
 			_data[0][x] = PuyoID::壁;
 			_data[(__int64)gridMax.y-1][x] = PuyoID::壁;

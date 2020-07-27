@@ -3,7 +3,7 @@
 #include <utility>
 #include "common/_debug/_DeBugConOut.h"
 #include "common/TimeCount.h"
-
+#include "SceneMng.h"
 
 
 Puyo::Puyo(Vector2&& pos, PuyoID id)
@@ -21,7 +21,11 @@ Puyo::~Puyo()
 
 void Puyo::Draw(Vector2 offset)
 {
-	DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, color_, true);
+	//DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, color_, true);
+	DrawOval(pos_.x+_size.x / 2+offset.x,
+		pos_.y+ _size.y / 2 + 24*_cnt,
+		_size.x/2,
+		(_size.y/2)-12*_cnt, color_, true);
 
 }
 
@@ -133,6 +137,17 @@ bool Puyo::Alive(bool flag)
 	return _alive=flag;
 }
 
+void Puyo::puyo(double no)
+{
+
+
+	_cnt =no;
+
+
+
+
+}
+
 const Vector2 Puyo::GetGrid(int size)
 {
 
@@ -146,7 +161,7 @@ void Puyo::Init(void)
 	_dropCnt = 0;
 	_dropInt = 20;
 	_state = PuyoState::óéÇøÇÈ;
-
+	_cnt = 0;
 	switch (id_)
 	{
 	case PuyoID::ê‘:
