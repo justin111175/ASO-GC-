@@ -7,6 +7,7 @@ enum class InputID
 	Down,
 	Left,
 	Right,
+	Btn1,
 	Max
 };
 

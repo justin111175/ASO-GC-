@@ -14,6 +14,9 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	_id = _stateCount;
 	_stateCount++;
 	
+	tagetID = 0;
+
+
 	// move:
 	//		引数で与えられたオブジェクトの持つリソースを左辺へオブジェクトに移動する機能を提供します。
 	//		所有権を移動します。std::moveは、C++11で追加されました。std::moveは、キャストの１つです。
@@ -21,8 +24,11 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	State::_size = std::move(_size);
 
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
+	int id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
+	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 
-	int id= (rand() % (static_cast<int>(PuyoID::Max)-2)+1);
+	pos_ = { gridMax.x / 2 * blockSize_,blockSize_ * 2 };
+	id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 	Init();
 
@@ -82,7 +88,8 @@ void State::Draw(void)
 	for (auto&& puyo : _puyo)
 	{
 		puyo->Draw(_offset);
-
+		DrawString(_puyo[0]->Pos().x, _puyo[0]->Pos().y, "0", 0xFFFFFF, true);
+		DrawString(_puyo[1]->Pos().x, _puyo[1]->Pos().y, "1", 0xFFFFFF, true);
 	}
 
 
@@ -106,91 +113,176 @@ void State::playerCtl(void)
 
 
 	(*controller[conType::Key])();
+	auto test = [&](sharedPuyo& puyo0, sharedPuyo& puyo1) {
 
+
+
+		if (puyo0->Pos().y > puyo1->Pos().y)
+		{
+
+			puyo1->Pos({ puyo0->Pos().x- blockSize_, puyo0->Pos().y  });
+
+			return true;
+			
+		}
+		
+		if (puyo0->Pos().x < puyo1->Pos().x)
+		{
+
+			puyo1->Pos({ puyo0->Pos().x, puyo0->Pos().y - blockSize_ });
+
+			std::swap(puyo0, puyo1);
+
+			tagetID = tagetID ^ 1;
+
+			return true;
+
+		}
+
+		//if (tagetID == 0)
+		{
+			if (puyo0->Pos().x > puyo1->Pos().x)
+			{
+
+				puyo1->Pos({ puyo0->Pos().x, puyo0->Pos().y + blockSize_ });
+				//if (tagetID==0)
+						
+				std::swap(puyo0, puyo1);
+
+				tagetID = tagetID ^ 1;
+
+				
+
+
+				return true;
+
+			}	
+		}
+
+
+
+
+
+		if (puyo0->Pos().y < puyo1->Pos().y)
+		{
+
+
+			puyo1->Pos({ puyo0->Pos().x + blockSize_, puyo0->Pos().y });
+
+
+			return true;
+
+		}
+
+	
+		return false;
+
+
+
+	
+	
+	};
 	for (auto data : controller[conType::Key]->GetCntData())
 	{
 		if (data.first != InputID::Down)
-		{
+		{	
+			//tagetID = tagetID ^ 1;
+
 			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
 			{
-				auto pos = _puyo[0]->GetGrid(blockSize_);
-				if (_data[pos.y][pos.x + 1] != PuyoID::NON)
+				if (data.first != InputID::Btn1)
 				{
-					_pData._bit.RIGHT = 0;
+					for (int i = 0; i < 2; i++)
+					{
+						auto pos = _puyo[i]->GetGrid(blockSize_);
+						if (_data[pos.y][pos.x + 1] != PuyoID::NON)
+						{
+							_pData._bit.RIGHT = 0;
+						}
+						if (_data[pos.y][pos.x - 1] != PuyoID::NON)
+						{
+							_pData._bit.LEFT = 0;
+						}
+						_puyo[i]->SetPData(_pData._bit);
+						_puyo[i]->Move(data.first);
+					}
 				}
-				if (_data[pos.y][pos.x - 1] != PuyoID::NON)
+				else
 				{
-					_pData._bit.LEFT = 0;
+					test(_puyo[tagetID], _puyo[tagetID^1]);
 				}
 
-				_puyo[0]->SetPData(_pData._bit);
-				_puyo[0]->Move(data.first);
+
 			}
 		}
 		else
 		{
 			if (data.second[static_cast<int>(Trg::Now)])
 			{
-				auto pos = _puyo[0]->GetGrid(blockSize_);
-
-				if (_data[(_int64)pos.y + 1][pos.x] != PuyoID::NON)
+				for (int i = 0; i < 2; i++)
 				{
-					_pData._bit.DOWN = 0;
-					_puyo[0]->_State(PuyoState::止まる);
-					break;
+					auto pos = _puyo[i]->GetGrid(blockSize_);
+
+					if (_data[(_int64)pos.y + 1][pos.x] != PuyoID::NON)
+					{
+						_pData._bit.DOWN = 0;
+						//_puyo[i]->_State(PuyoState::止まる);
+						break;
+					}
+
+					_puyo[i]->SetPData(_pData._bit);
+
+					_puyo[i]->Move(data.first);
 				}
 
-				_puyo[0]->SetPData(_pData._bit);
-
-				_puyo[0]->Move(data.first);
 
 
 			}
 		}
 	}
 
-	(*controller[conType::Pad])();
+	//(*controller[conType::Pad])();
 
-	for (auto data : controller[conType::Pad]->GetCntData(_id))
-	{
-		if (data.first != InputID::Down)
-		{
-			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-			{
-				auto pos = _puyo[0]->GetGrid(blockSize_);
-				if (_data[pos.y][pos.x + 1] != PuyoID::NON)
-				{
-					_pData._bit.RIGHT = 0;
-				}
-				if (_data[pos.y][pos.x - 1] != PuyoID::NON)
-				{
-					_pData._bit.LEFT = 0;
-				}
+	//for (auto data : controller[conType::Pad]->GetCntData(_id))
+	//{
+	//	if (data.first != InputID::Down)
+	//	{
+	//		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+	//		{
+	//			auto pos = _puyo[0]->GetGrid(blockSize_);
+	//			if (_data[pos.y][pos.x + 1] != PuyoID::NON)
+	//			{
+	//				_pData._bit.RIGHT = 0;
+	//			}
+	//			if (_data[pos.y][pos.x - 1] != PuyoID::NON)
+	//			{
+	//				_pData._bit.LEFT = 0;
+	//			}
 
-				_puyo[0]->SetPData(_pData._bit);
-				_puyo[0]->Move(data.first);
-			}
-		}
-		else
-		{
-			if (data.second[static_cast<int>(Trg::Now)])
-			{
-				auto pos = _puyo[0]->GetGrid(blockSize_);
+	//			_puyo[0]->SetPData(_pData._bit);
+	//			_puyo[0]->Move(data.first);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		if (data.second[static_cast<int>(Trg::Now)])
+	//		{
+	//			auto pos = _puyo[0]->GetGrid(blockSize_);
 
-				if (_data[(_int64)pos.y + 1][pos.x] != PuyoID::NON)
-				{
-					_pData._bit.DOWN = 0;
-					_puyo[0]->_State(PuyoState::止まる);
-					break;
-				}
+	//			if (_data[(_int64)pos.y + 1][pos.x] != PuyoID::NON)
+	//			{
+	//				_pData._bit.DOWN = 0;
+	//				_puyo[0]->_State(PuyoState::止まる);
+	//				break;
+	//			}
 
-				_puyo[0]->SetPData(_pData._bit);
+	//			_puyo[0]->SetPData(_pData._bit);
 
-				_puyo[0]->Move(data.first);
+	//			_puyo[0]->Move(data.first);
 
-			}
-		}
-	}
+	//		}
+	//	}
+	//}
 
 }
 
@@ -205,7 +297,6 @@ bool State::downCheck(sharedPuyo& puyo)
 
 		puyo->Pos(pos * blockSize_);
 		_pData._bit.DOWN = 0;
-		//puyo->_State(PuyoState::止まる);
 		_data[pos.y][pos.x] = puyo->ID();
 
 	}
@@ -226,6 +317,10 @@ bool State::InstancePuyo(void)
 {
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 	int id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
+	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
+	
+	pos_ = { gridMax.x / 2 * blockSize_,blockSize_*2 };
+	id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 
 
@@ -322,25 +417,34 @@ void State::Init(void)
 	test.try_emplace(PuyoMode::落下, [&]() {
 		playerCtl();
 
-		bool nextFlag = true;
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
 
-			//for (auto&& puyo : _puyo)
-			{
-				puyo->Run();
+		_puyo[tagetID]->Run();
+		_puyo[tagetID^1]->Run();
 
-			}
-			return nextFlag &= downCheck(puyo);
-
-		});
-		
-		if (nextFlag)
+		if (downCheck(_puyo[tagetID^1])|| downCheck(_puyo[tagetID]))
 		{
-			_cnt = 0;
 			puyomode_ = PuyoMode::ぷよ;
-	
-			//InstancePuyo();
 		}
+		//bool nextFlag = true;
+		//std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+		//	//for (auto&& puyo : _puyo)
+		//	{
+		//		puyo->Run();
+
+		//	}
+
+		//	return nextFlag &= downCheck(puyo);
+
+		//});
+		//
+		//if (nextFlag)
+		//{
+		//	_cnt = 0;
+		//	puyomode_ = PuyoMode::ぷよ;
+	
+		//	//InstancePuyo();
+		//}
 
 
 
@@ -436,22 +540,40 @@ void State::Init(void)
 
 	test.try_emplace(PuyoMode::連鎖落下, [&]() {
 	
-		puyomode_ = PuyoMode::連鎖;
+		bool nextFlag = true;
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+			//for (auto&& puyo : _puyo)
+			{
+				puyo->Run();
+
+			}
+			return nextFlag &= downCheck(puyo);
+
+		});
+
+		if (nextFlag)
+		{
+			_cnt = 0;
+			puyomode_ = PuyoMode::ぷよ;
+
+			//InstancePuyo();
+		}
 	
 	
 	});
 
 	test.try_emplace(PuyoMode::ぷよ, [&]() {
 	
-		if (_cnt <= 60)
-		{
-			_cnt+=2;
-			for (auto&& puyo : _puyo)
-			{
-				puyo->puyo(sin(_cnt / 10.0));
-			}
-		}
-		else
+		//if (_cnt <= 60)
+		//{
+		//	_cnt+=2;
+		//	for (auto&& puyo : _puyo)
+		//	{
+		//		puyo->puyo(sin(_cnt / 10.0));
+		//	}
+		//}
+	//	else
 		{
 			_cnt = 0;
 			puyomode_ = PuyoMode::連鎖;

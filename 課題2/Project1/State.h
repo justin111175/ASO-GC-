@@ -66,6 +66,7 @@ private:
 	static int _stateCount;
 	int _id;
 	int _color;
+	int tagetID;
 };
 
 
