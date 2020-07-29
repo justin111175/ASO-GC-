@@ -18,12 +18,7 @@ enum class PuyoID
 	Max
 };
 
-enum class PuyoState
-{
-	—Ž‚¿‚é,
-	Ž~‚Ü‚é,
-	MAX
-};
+
 
 struct DirBit
 {
@@ -48,12 +43,9 @@ public:
 	~Puyo();
 
 	void Draw(Vector2 offset);
-	bool Run(void);
+	bool Run(int no);
 	void Move(InputID id);
 	bool SetPData(DirBit dirbit);
-	
-	const PuyoState& State(void);
-	bool _State(PuyoState state);
 	
 	const Vector2& Pos(void);
 	bool Pos(Vector2 pos);
@@ -63,7 +55,7 @@ public:
 	const bool& Alive(void);
 	bool Alive(bool flag);
 
-	void puyo(double no);
+	bool puyo(void);
 
 	Permit_Data _pData;
 
@@ -74,7 +66,6 @@ private:
 
 	int _dropCnt;
 	int _dropInt;
-	PuyoState _state;
 	
 	void Init(void);
 	int color_;

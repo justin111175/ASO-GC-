@@ -23,13 +23,13 @@ void Puyo::Draw(Vector2 offset)
 {
 	//DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, color_, true);
 	DrawOval(pos_.x+_size.x / 2+offset.x,
-		pos_.y+ _size.y / 2 + 24*_cnt,
+		pos_.y+ _size.y / 2 + 24* sin(_cnt / 10.0),
 		_size.x/2,
-		(_size.y/2)-12*_cnt, color_, true);
+		(_size.y/2)-12* sin(_cnt / 10.0), color_, true);
 
 }
 
-bool Puyo::Run(void)
+bool Puyo::Run(int no)
 {
 
 	if (_dropCnt < _dropInt)
@@ -39,7 +39,7 @@ bool Puyo::Run(void)
 	}
 	else
 	{
-		pos_.y++;
+		pos_.y+=no;
 		return true;
 	}
 	
@@ -49,8 +49,7 @@ bool Puyo::Run(void)
 
 void Puyo::Move(InputID id)
 {
-	if (_state == PuyoState::—Ž‚¿‚é)
-	{
+
 		switch (id)
 		{
 		case InputID::Up:
@@ -85,7 +84,7 @@ void Puyo::Move(InputID id)
 		default:
 			break;
 		}
-	}
+	
 
 }
 
@@ -95,18 +94,7 @@ bool Puyo::SetPData(DirBit dirbit)
 	return true;
 }
 
-const PuyoState& Puyo::State(void)
-{
-	return _state;
-}
 
-bool Puyo::_State(PuyoState state)
-{
-	
-	_state = state;
-	return true;
-
-}
 
 const Vector2& Puyo::Pos(void)
 {
@@ -137,13 +125,22 @@ bool Puyo::Alive(bool flag)
 	return _alive=flag;
 }
 
-void Puyo::puyo(double no)
+bool Puyo::puyo(void)
 {
 
 
-	_cnt =no;
 
+	if (_cnt <= 60)
+	{
+		_cnt += 2;
+		return false;
 
+	}
+	else
+	{
+		_cnt = 0;
+		return true;
+	}
 
 
 }
@@ -160,7 +157,6 @@ void Puyo::Init(void)
 	_alive = true;
 	_dropCnt = 0;
 	_dropInt = 20;
-	_state = PuyoState::—Ž‚¿‚é;
 	_cnt = 0;
 	switch (id_)
 	{

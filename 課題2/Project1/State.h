@@ -40,7 +40,7 @@ private:
 	std::map<conType,std::unique_ptr<Controller>> controller;
 	
 	
-	std::map<PuyoMode,std::function<void(void)>> test;
+	std::map<PuyoMode,std::function<void(void)>> puyoMode_;
 	
 	std::vector<sharedPuyo> _puyo;
 
