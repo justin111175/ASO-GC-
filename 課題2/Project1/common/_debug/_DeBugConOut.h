@@ -1,46 +1,36 @@
 #pragma once
-
 #ifdef _DEBUG
+#include <windows.h>
 #include <memory>
-#define AST() {\
-	CHAR ast_mes[256]; \
-	wsprintf(ast_mes, "%s %d行目\0", __FILE__, __LINE__); \
-	MessageBox(0, ast_mes, "ｱｻｰﾄ表示", MB_OK); \
-	}
+#include <assert.h>
+// ﾃﾞﾊﾞｯｸﾞﾒｯｾｰｼﾞ用定義
 
-#define TRACE(fmt,...) printf(fmt,__VA_ARGS__)
-#else
-#define AST()
-#endif
+#define TRACE(fmt, ...) printf(fmt, __VA_ARGS__);
 
-#ifdef _DEBUG
-class _DeBugConOut
+class _DebugConOut
 {
 public:
-	// シングルトン
-	static _DeBugConOut &GetInstance(void)
+	static _DebugConOut& GetInstance()
 	{
 		return *sInstance;
 	}
+
 private:
-	// 関数オブジェクト
-	struct _DeBugConOutDeleter
+	struct _DebugConOutDeleter
 	{
-		void operator()(_DeBugConOut*_debugConOut)const
+		void operator()(_DebugConOut * _debugConOut) const
 		{
 			delete _debugConOut;
 		}
 	};
-	
-	_DeBugConOut();
-	~_DeBugConOut();
+
+	_DebugConOut();
+	~_DebugConOut();
 
 	FILE* _debugFp = nullptr;
-	
-	static std::unique_ptr<_DeBugConOut, _DeBugConOutDeleter> sInstance;
+	static std::unique_ptr<_DebugConOut, _DebugConOutDeleter> sInstance;
 };
 
-#else
-#define AST()
+#else	//_DEBUG
 #define TRACE(fmt, ...)
-#endif
+#endif	//_DEBUG

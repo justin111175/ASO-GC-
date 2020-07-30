@@ -18,7 +18,11 @@ enum class PuyoID
 	Max
 };
 
-
+enum class test
+{
+	stay,
+	puyo
+};
 
 struct DirBit
 {
@@ -41,12 +45,14 @@ class Puyo
 public:
 	Puyo(Vector2&& pos, PuyoID id);
 	~Puyo();
-
+	test test_;
 	void Draw(Vector2 offset);
 	bool Run(int no);
 	void Move(InputID id);
 	bool SetPData(DirBit dirbit);
 	
+	bool SetDrawData(DirBit& dirbit);
+
 	const Vector2& Pos(void);
 	bool Pos(Vector2 pos);
 
@@ -54,12 +60,15 @@ public:
 
 	const bool& Alive(void);
 	bool Alive(bool flag);
-
+	
+	bool Cnt(double cnt);
 	bool puyo(void);
 
 	Permit_Data _pData;
+	Permit_Data _drawData;
 
 	virtual const Vector2 GetGrid(int size);
+
 private:
 	double _cnt;
 	bool _alive;

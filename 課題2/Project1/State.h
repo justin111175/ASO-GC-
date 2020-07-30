@@ -9,8 +9,9 @@ enum class PuyoMode
 {
 	—‰º,
 	˜A½,
-	˜A½—‰º,
+	//˜A½—‰º,
 	‚Õ‚æ,
+	‚Ş‚É‚å‚ñ,
 	MAX
 };
 
@@ -35,6 +36,7 @@ private:
 	bool SetEraser(PuyoID id, Vector2 pos);
 	void delPuyo(void);
 	Permit_Data _pData;
+	Permit_Data _drawData;
 
 
 	std::map<conType,std::unique_ptr<Controller>> controller;
@@ -46,7 +48,6 @@ private:
 
 	const int blockSize_;
 	const Vector2 gridMax;
-	//int mapData[8][14];
 
 	std::vector<PuyoID> _dataBase;
 	std::vector<PuyoID*> _data;
@@ -56,7 +57,6 @@ private:
 
 	bool InstancePuyo(void);
 
-	int _cnt;
 
 	int screenID;
 	void Init(void);

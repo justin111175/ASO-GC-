@@ -146,6 +146,7 @@
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="common\TimeCount.cpp" />
     <ClCompile Include="common\_debug\_DeBugConOut.cpp" />
+    <ClCompile Include="common\_debug\_DebugDispOut.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="common\Input\KeyInput.cpp" />
     <ClCompile Include="main.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="common\Vector2.h" />
     <ClInclude Include="common\_debug\_DeBugConOut.h" />
     <ClInclude Include="common\Input\Controller.h" />
+    <ClInclude Include="common\_debug\_DebugDispOut.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="common\Input\KeyInput.h" />
     <ClInclude Include="common\Input\InputID.h" />

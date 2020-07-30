@@ -78,7 +78,6 @@ void State::Draw(void)
 
 			}
 
-
 			DrawBox(_offset.x + x * blockSize_, _offset.y + y * blockSize_,
 				_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFFFFFF, false);
 		}
@@ -99,6 +98,7 @@ void State::Run(void)
 {
 
 	puyoMode_[puyomode_]();
+
 
 }
 
@@ -280,7 +280,6 @@ bool State::InstancePuyo(void)
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 	int id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
-	
 	pos_ = { gridMax.x / 2 * blockSize_,blockSize_*2 };
 	id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
@@ -386,26 +385,7 @@ void State::Init(void)
 		{
 			puyomode_ = PuyoMode::ぷよ;
 		}
-		//bool nextFlag = true;
-		//std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
 
-		//	//for (auto&& puyo : _puyo)
-		//	{
-		//		puyo->Run();
-
-		//	}
-
-		//	return nextFlag &= downCheck(puyo);
-
-		//});
-		//
-		//if (nextFlag)
-		//{
-		//	_cnt = 0;
-		//	puyomode_ = PuyoMode::ぷよ;
-	
-		//	//InstancePuyo();
-		//}
 
 
 
@@ -461,21 +441,15 @@ void State::Init(void)
 
 			});
 
-
-			TRACE("%d\n", rennsaFlag);
-
 			if (rennsaFlag)
 			{
-				_cnt = 0;
 				
-
-				InstancePuyo();
-				puyomode_ = PuyoMode::落下;
+				puyomode_ = PuyoMode::むにょん;
 
 			}
 			else
 			{
-				puyomode_ = PuyoMode::連鎖落下;
+				puyomode_ = PuyoMode::連鎖;
 			}
 
 
@@ -489,49 +463,16 @@ void State::Init(void)
 	
 	});
 
-	puyoMode_.try_emplace(PuyoMode::連鎖落下, [&]() {
-	
-		bool nextFlag = true;
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
-
-			//for (auto&& puyo : _puyo)
-			{
-				puyo->Run(4);
-
-			}
-			return nextFlag &= downCheck(puyo);
-
-		});
-
-		if (nextFlag)
-		{
-			_cnt = 0;
-			puyomode_ = PuyoMode::ぷよ;
-
-			//InstancePuyo();
-		}
-	
-	
-	});
 
 	puyoMode_.try_emplace(PuyoMode::ぷよ, [&]() {
 	
+
 		bool Flag = true;
-		auto check = [&](sharedPuyo& puyo) {
-
-			auto pos = puyo->GetGrid(blockSize_);
-
-			if (_data[(__int64)pos.y + 1][pos.x] == PuyoID::壁)
-			{
-				return true;
-			}
-			return false;
-		
-		};
-
 		std::function<bool (sharedPuyo& puyo)> test = [&](sharedPuyo& puyo) {
-			if (downCheck(_puyo[tagetID ^ 1]) || downCheck(_puyo[tagetID]))
+			auto Pos = _puyo[tagetID]->GetGrid(blockSize_);
+			//if (_data[Pos.y+1][Pos.x]!= PuyoID::NON)
 			{
+				puyo->test_ = test::puyo;
 				if (puyo->puyo())
 				{
 					return true;
@@ -543,26 +484,121 @@ void State::Init(void)
 
 		};
 
-		std::for_each(_puyo.begin(), _puyo.end(), [&](sharedPuyo& puyo) {
+		//auto dirCheck = [&](sharedPuyo& puyo) {
+		//	auto Pos = puyo->GetGrid(blockSize_);
+		//	if (_data[Pos.y+1][Pos.x]!= PuyoID::NON)
+		//	{
+		//		if (puyo->puyo())
+		//		{
+		//			return true;
+		//		}
+		//	}
+		//};
+		//if (dirCheck(_puyo[tagetID]))
+		//{
+		//	puyomode_ = PuyoMode::連鎖;
+		//}
 
-			return Flag &= test(puyo);
+		//std::for_each(_puyo.begin(), _puyo.end(), [&](sharedPuyo& puyo) {
 
-		});
+		//	return ;
 
+		//});
+		Flag &= (test(_puyo[tagetID])|| test(_puyo[tagetID^1]));
 
-
+		//if ((_puyo[tagetID]->puyo())&& (_puyo[tagetID^1]->puyo()))
+		//{
+		//	
+		//	return true;
+		//}
+		//else
 
 		if (Flag)
 		{
-
-			puyomode_ = PuyoMode::連鎖;
+			_puyo[tagetID]->Cnt(0);
+			_puyo[tagetID^1]->Cnt(0);
+		puyomode_ = PuyoMode::連鎖;
+			
 		}
 
+		//bool flag = true;
+
+		//auto dirCheck = [&](PuyoID id, Vector2 vec) {
+
+		//	return  (_data[vec.y][vec.x] != PuyoID::NON);
+		//};
+		//auto check = [&](sharedPuyo& puyo) {
+
+		//	auto Pos = puyo->GetGrid(blockSize_);
+		//	if (dirCheck(puyo->ID(), { Pos.x ,Pos.y + 1 }))
+		//	{
+		//		std::for_each(_puyo.begin(), _puyo.end(), [&](sharedPuyo& puyo) {
+
+		//			if (puyo->puyo())
+		//			{
+		//				
+
+		//			}
+		//		});
+		//		return true;
+		//	}
+
+		//};
+		//
+		//std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+		//	return flag &= check(puyo);
+
+		//});
+
+		//if (flag)
+		//{
+		//	puyomode_ = PuyoMode::連鎖;
+
+		//}
 
 	
 	});
 
+	puyoMode_.try_emplace(PuyoMode::むにょん, [&]() {
+					
+		bool flag = true;
 
+		auto dirCheck = [&](PuyoID id, Vector2 vec) {
+
+			return !(id == _data[vec.y][vec.x]);
+		};
+		auto check = [&](sharedPuyo& puyo) {
+		
+			_drawData._bit = { 1,1,1,1 };
+			auto Pos = puyo->GetGrid(blockSize_);
+			_drawData._bit.RIGHT = dirCheck(puyo->ID(), { Pos.x + 1,Pos.y });
+			_drawData._bit.LEFT = dirCheck(puyo->ID(), { Pos.x - 1,Pos.y });
+			_drawData._bit.UP = dirCheck(puyo->ID(), { Pos.x ,Pos.y - 1 });
+			_drawData._bit.DOWN = dirCheck(puyo->ID(), { Pos.x ,Pos.y + 1 });
+
+			puyo->SetDrawData(_drawData._bit);
+
+			return true;
+		
+		};
+
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+			return flag &= check(puyo);
+
+		});
+		if (flag)
+		{
+			InstancePuyo();
+
+			puyomode_ = PuyoMode::落下;
+
+		}
+
+
+
+	});
 
 
 	_dataBase.resize((__int64)gridMax.x * gridMax.y);
@@ -579,6 +615,7 @@ void State::Init(void)
 	{
 		_Eraserdata.emplace_back(&_EraserdataBase[no * gridMax.x]);
 	}
+	
 
 	for (int x = 0; x < gridMax.x;x++)
 	{

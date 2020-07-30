@@ -23,10 +23,43 @@ void Puyo::Draw(Vector2 offset)
 {
 	//DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, color_, true);
 	DrawOval(pos_.x+_size.x / 2+offset.x,
-		pos_.y+ _size.y / 2 + 24* sin(_cnt / 10.0),
+		pos_.y+ _size.y/2  + 24* sin(_cnt / 10.0),
 		_size.x/2,
-		(_size.y/2)-12* sin(_cnt / 10.0), color_, true);
+		(_size.y/2), color_, true);
+	
+	//ç∂
+	if (!_drawData._bit.LEFT)
+	{
+		DrawBox(pos_.x + offset.x, 
+			pos_.y + 24 * sin(_cnt / 10.0),
+			pos_.x + _size.x / 2 + offset.x, 
+			pos_.y + _size.y + 24 * sin(_cnt / 10.0), color_, true);
+	}
+	//âE
+	if (!_drawData._bit.RIGHT)
+	{
+		DrawBox(pos_.x + _size.x/2 + offset.x, 
+			pos_.y + 24 * sin(_cnt / 10.0),
+			pos_.x + _size.x  + offset.x, 
+			pos_.y + _size.y + 24 * sin(_cnt / 10.0), color_, true);
+	}
 
+	//è„
+	if (!_drawData._bit.UP )
+	{
+		DrawBox(pos_.x + offset.x, 
+			pos_.y + 24 * sin(_cnt / 10.0),
+			pos_.x + _size.x + offset.x, 
+			pos_.y + _size.y / 2 + 24 * sin(_cnt / 10.0), color_, true);
+	}
+	//â∫
+	if (!_drawData._bit.DOWN)
+	{
+		DrawBox(pos_.x + offset.x,
+			pos_.y + _size.y / 2 + 24 * sin(_cnt / 10.0),
+			pos_.x + _size.x + offset.x,
+			pos_.y + _size.y + 24 * sin(_cnt / 10.0), color_, true);
+	}
 }
 
 bool Puyo::Run(int no)
@@ -94,6 +127,12 @@ bool Puyo::SetPData(DirBit dirbit)
 	return true;
 }
 
+bool Puyo::SetDrawData(DirBit& dirbit)
+{
+	_drawData._bit = dirbit;
+	return true;
+}
+
 
 
 const Vector2& Puyo::Pos(void)
@@ -125,22 +164,32 @@ bool Puyo::Alive(bool flag)
 	return _alive=flag;
 }
 
+bool Puyo::Cnt(double cnt)
+{
+	_cnt = cnt;
+	return true;
+}
+
 bool Puyo::puyo(void)
 {
 
-
-
-	if (_cnt <= 60)
+	if (test_ == test::puyo)
 	{
-		_cnt += 2;
-		return false;
+		if (_cnt < 30)
+		{
+			_cnt += 2;
+			return false;
+
+		}
+		else
+		{
+			test_ == test::stay;
+			return true;
+		}
 
 	}
-	else
-	{
-		_cnt = 0;
-		return true;
-	}
+
+
 
 
 }
@@ -154,6 +203,8 @@ const Vector2 Puyo::GetGrid(int size)
 
 void Puyo::Init(void)
 {
+	_drawData._bit = { 1,1,1,1 };
+	test_ = test::stay;
 	_alive = true;
 	_dropCnt = 0;
 	_dropInt = 20;

@@ -1,20 +1,21 @@
 #ifdef _DEBUG
+
 #include <Windows.h>
-#include "_DeBugConOut.h"
+#include "_DebugConOut.h"
 
-std::unique_ptr<_DeBugConOut, _DeBugConOut::_DeBugConOutDeleter> _DeBugConOut::sInstance(new _DeBugConOut);
+std::unique_ptr<_DebugConOut, _DebugConOut::_DebugConOutDeleter> _DebugConOut::sInstance(new _DebugConOut);
 
-_DeBugConOut::_DeBugConOut()
+_DebugConOut::_DebugConOut()
 {
 	AllocConsole();
 	freopen_s(&_debugFp, "CONOUT$", "w", stdout);
-	freopen_s(&_debugFp, "CONIN$", "r", stdin);
+	freopen_s(&_debugFp, "CONIN$",  "r", stdin);
 }
 
-_DeBugConOut::~_DeBugConOut()
-{
 
+_DebugConOut::~_DebugConOut()
+{
 	FreeConsole();
 }
 
-#endif
+#endif	//_DEBUG
