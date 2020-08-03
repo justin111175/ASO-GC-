@@ -4,18 +4,20 @@
 #include "Puyo.h"
 #include <vector>
 #include "common/Input/Controller.h"
-
+#include "drop.h"
 enum class PuyoMode
 {
 	落下,
-	連鎖,
-	//連鎖落下,
 	ぷよ,
 	むにょん,
+	連鎖,
+	消す,
+	オーバーチェック,
 	MAX
 };
 
 using sharedPuyo = std::shared_ptr<Puyo>;
+
 
 class State
 {
@@ -27,8 +29,12 @@ public:
 	void Draw(void);
 	void Run(void);
 	
+	bool OverFlag;
+
+
 
 private:
+	friend Drop;
 	PuyoMode puyomode_;
 	
 	void playerCtl(void);

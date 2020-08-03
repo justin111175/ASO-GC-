@@ -23,7 +23,7 @@ void Puyo::Draw(Vector2 offset)
 {
 	//DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, color_, true);
 	DrawOval(pos_.x+_size.x / 2+offset.x,
-		pos_.y+ _size.y/2  + 24* sin(_cnt / 10.0),
+		pos_.y+ _size.y/2  +24* puyoPos_,
 		_size.x/2,
 		(_size.y/2), color_, true);
 	
@@ -167,6 +167,8 @@ bool Puyo::Alive(bool flag)
 bool Puyo::Cnt(double cnt)
 {
 	_cnt = cnt;
+	puyoPos_ = sin(_cnt / 10.0);
+
 	return true;
 }
 
@@ -177,7 +179,8 @@ bool Puyo::puyo(void)
 	{
 		if (_cnt < 30)
 		{
-			_cnt += 2;
+			_cnt += 2; 
+			puyoPos_ = sin(_cnt / 10.0);
 			return false;
 
 		}
@@ -208,6 +211,7 @@ void Puyo::Init(void)
 	_alive = true;
 	_dropCnt = 0;
 	_dropInt = 20;
+	puyoPos_ = 0;
 	_cnt = 0;
 	switch (id_)
 	{

@@ -82,6 +82,7 @@ private:
 	Vector2 _size;
 
 	PuyoID id_;
+	double puyoPos_;
 
 };
 

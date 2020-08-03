@@ -15,7 +15,8 @@ bool KeyInput::SetUp(int no)
 			{InputID::Down,KEY_INPUT_S},
 			{InputID::Left,KEY_INPUT_A},
 			{InputID::Right,KEY_INPUT_D},
-			{InputID::Btn1,KEY_INPUT_V}
+			{InputID::Btn1,KEY_INPUT_V},
+			{InputID::Btn2,KEY_INPUT_B}
 
 		};
 
@@ -28,7 +29,8 @@ bool KeyInput::SetUp(int no)
 			{InputID::Down,KEY_INPUT_DOWN},
 			{InputID::Left,KEY_INPUT_LEFT},
 			{InputID::Right,KEY_INPUT_RIGHT},	
-			{InputID::Btn1,KEY_INPUT_M}
+			{InputID::Btn1,KEY_INPUT_M},
+			{InputID::Btn2,KEY_INPUT_N}
 
 		};
 	}

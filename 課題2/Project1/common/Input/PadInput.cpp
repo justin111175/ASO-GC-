@@ -15,7 +15,9 @@ bool PadInput::SetUp(int no)
 			{InputID::Up, PAD_INPUT_UP},
 			{InputID::Down, PAD_INPUT_DOWN},
 			{InputID::Left, PAD_INPUT_LEFT},
-			{InputID::Right, PAD_INPUT_RIGHT}
+			{InputID::Right, PAD_INPUT_RIGHT},
+			{InputID::Btn1,PAD_INPUT_1},
+			{InputID::Btn2,PAD_INPUT_2}
 
 		};
 
@@ -26,7 +28,9 @@ bool PadInput::SetUp(int no)
 			{InputID::Up, PAD_INPUT_UP},
 			{InputID::Down, PAD_INPUT_DOWN},
 			{InputID::Left, PAD_INPUT_LEFT},
-			{InputID::Right, PAD_INPUT_RIGHT}
+			{InputID::Right, PAD_INPUT_RIGHT},
+			{InputID::Btn1,PAD_INPUT_1},
+			{InputID::Btn2,PAD_INPUT_2}
 
 		};
 

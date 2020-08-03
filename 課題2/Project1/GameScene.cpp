@@ -4,12 +4,12 @@
 #include <Vector2.h>
 #include <SceneMng.h>
 #include <utility>
-
+#include "GameOver.h"
 GameScene::GameScene()
 {	
 
 
-	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(0, 0)), std::move(Vector2(1280, 800))/*,PlayerCtl::Player_1*/));
+	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(100, 100)), std::move(Vector2(1280, 800))/*,PlayerCtl::Player_1*/));
 	//playerState.emplace_back(std::make_unique<State>(std::move (Vector2(600, 0)), std::move(Vector2(1280, 800))/*,PlayerCtl::Player_1*/));
 
 
@@ -29,10 +29,15 @@ unique_Base GameScene::Update(unique_Base own)
 	for (auto&& state : playerState)
 	{
 		state->Run();
+		if (state->OverFlag)
+		{
+			return std::make_unique<GameOver>();
+
+		}
 
 	}
 
-
+	
 	return std::move(own);
 }
 

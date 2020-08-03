@@ -8,6 +8,7 @@ enum class InputID
 	Left,
 	Right,
 	Btn1,
+	Btn2,
 	Max
 };
 
