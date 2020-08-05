@@ -152,6 +152,7 @@
     <ClCompile Include="common\Input\KeyInput.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="common\Input\PadInput.cpp" />
+    <ClCompile Include="Ojyama.cpp" />
     <ClCompile Include="Puyo.cpp" />
     <ClCompile Include="SceneMng.cpp" />
     <ClCompile Include="State.cpp" />
@@ -165,12 +166,12 @@
     <ClInclude Include="common\_debug\_DeBugConOut.h" />
     <ClInclude Include="common\Input\Controller.h" />
     <ClInclude Include="common\_debug\_DebugDispOut.h" />
-    <ClInclude Include="drop.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="common\Input\KeyInput.h" />
     <ClInclude Include="common\Input\InputID.h" />
     <ClInclude Include="common\Input\PadInput.h" />
+    <ClInclude Include="Ojyama.h" />
     <ClInclude Include="Puyo.h" />
     <ClInclude Include="SceneMng.h" />
     <ClInclude Include="State.h" />

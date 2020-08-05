@@ -9,6 +9,7 @@ enum class InputID
 	Right,
 	Btn1,
 	Btn2,
+	テスト用,
 	Max
 };
 

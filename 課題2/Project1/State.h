@@ -4,7 +4,8 @@
 #include "Puyo.h"
 #include <vector>
 #include "common/Input/Controller.h"
-#include "drop.h"
+#include "Ojyama.h"
+
 enum class PuyoMode
 {
 	落下,
@@ -12,11 +13,13 @@ enum class PuyoMode
 	むにょん,
 	連鎖,
 	消す,
+	お邪魔ぷよ落下,
 	オーバーチェック,
 	MAX
 };
 
 using sharedPuyo = std::shared_ptr<Puyo>;
+using sharedOjyama = std::shared_ptr<Ojyama>;
 
 
 class State
@@ -34,13 +37,14 @@ public:
 
 
 private:
-	friend Drop;
+	
 	PuyoMode puyomode_;
 	
 	void playerCtl(void);
 	bool downCheck(sharedPuyo& puyo);
 	bool SetEraser(PuyoID id, Vector2 pos);
 	void delPuyo(void);
+	
 	Permit_Data _pData;
 	Permit_Data _drawData;
 
@@ -48,9 +52,6 @@ private:
 	std::map<conType,std::unique_ptr<Controller>> controller;
 	
 	
-	std::map<PuyoMode,std::function<void(void)>> puyoMode_;
-	
-	std::vector<sharedPuyo> _puyo;
 
 	const int blockSize_;
 	const Vector2 gridMax;
@@ -62,7 +63,7 @@ private:
 	std::vector<PuyoID*> _Eraserdata;
 
 	bool InstancePuyo(void);
-
+	bool InstanceOjyamapuyo(void);
 
 	int screenID;
 	void Init(void);
@@ -73,6 +74,14 @@ private:
 	int _id;
 	int _color;
 	int tagetID;
+protected:
+
+	std::map<PuyoMode,std::function<void(void)>> puyoMode_;
+	
+	std::vector<sharedPuyo> _puyo;
+	std::vector<sharedOjyama> _ojyama;
+
+
 };
 
 

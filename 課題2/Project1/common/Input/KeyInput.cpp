@@ -16,7 +16,8 @@ bool KeyInput::SetUp(int no)
 			{InputID::Left,KEY_INPUT_A},
 			{InputID::Right,KEY_INPUT_D},
 			{InputID::Btn1,KEY_INPUT_V},
-			{InputID::Btn2,KEY_INPUT_B}
+			{InputID::Btn2,KEY_INPUT_B},
+			{InputID::テスト用,KEY_INPUT_T}
 
 		};
 

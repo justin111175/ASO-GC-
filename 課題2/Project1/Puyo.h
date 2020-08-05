@@ -13,7 +13,7 @@ enum class PuyoID
 	Â,
 	‰©,
 	‡,
-
+	‚¨×–‚‚Õ‚æ,
 	•Ç,
 	Max
 };
