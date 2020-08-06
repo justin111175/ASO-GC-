@@ -5,6 +5,7 @@
 #include <vector>
 #include "common/Input/Controller.h"
 #include "Ojyama.h"
+#include "NextPuyo.h"
 
 enum class PuyoMode
 {
@@ -18,7 +19,7 @@ enum class PuyoMode
 	MAX
 };
 
-using sharedPuyo = std::shared_ptr<Puyo>;
+
 using sharedOjyama = std::shared_ptr<Ojyama>;
 
 
@@ -41,7 +42,7 @@ private:
 	PuyoMode puyomode_;
 	
 	void playerCtl(void);
-	bool downCheck(sharedPuyo& puyo);
+	bool downCheck(sharePuyo& puyo);
 	bool SetEraser(PuyoID id, Vector2 pos);
 	void delPuyo(void);
 	
@@ -74,11 +75,14 @@ private:
 	int _id;
 	int _color;
 	int tagetID;
+
 protected:
 
 	std::map<PuyoMode,std::function<void(void)>> puyoMode_;
 	
-	std::vector<sharedPuyo> _puyo;
+	
+	std::vector<sharePuyo> _puyo;
+	std::unique_ptr<NextPuyo> nextPuyo_;
 	std::vector<sharedOjyama> _ojyama;
 
 

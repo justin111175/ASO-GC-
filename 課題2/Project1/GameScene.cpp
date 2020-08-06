@@ -9,9 +9,9 @@ GameScene::GameScene()
 {	
 
 
-	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(0, 0)), std::move(Vector2(384, 672))));
+	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(0, 0)), std::move(Vector2(500, 672))));
 
-	//playerState.emplace_back(std::make_unique<State>(std::move (Vector2(0, 0)), std::move(Vector2(384, 672))));
+	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(0, 0)), std::move(Vector2(500, 672))));
 
 
 }
@@ -61,7 +61,7 @@ void GameScene::Draw(void)
 	//}
 	
 	DrawGraph(100, 50, playerState[0]->GetScreenId(), true);
-	//DrawGraph(800, 50, playerState[1]->GetScreenId(), true);
+	DrawGraph(800, 50, playerState[1]->GetScreenId(), true);
 
 	ScreenFlip();
 

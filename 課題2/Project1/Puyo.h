@@ -5,6 +5,7 @@
 #include <memory>
 #include "common/Input/InputID.h"
 
+
 enum class PuyoID
 {
 	NON,
@@ -86,3 +87,4 @@ private:
 
 };
 
+using sharePuyo = std::shared_ptr<Puyo>;

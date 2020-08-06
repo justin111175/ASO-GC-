@@ -152,6 +152,7 @@
     <ClCompile Include="common\Input\KeyInput.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="common\Input\PadInput.cpp" />
+    <ClCompile Include="NextPuyo.cpp" />
     <ClCompile Include="Ojyama.cpp" />
     <ClCompile Include="Puyo.cpp" />
     <ClCompile Include="SceneMng.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="common\Input\KeyInput.h" />
     <ClInclude Include="common\Input\InputID.h" />
     <ClInclude Include="common\Input\PadInput.h" />
+    <ClInclude Include="NextPuyo.h" />
     <ClInclude Include="Ojyama.h" />
     <ClInclude Include="Puyo.h" />
     <ClInclude Include="SceneMng.h" />

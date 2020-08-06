@@ -7,9 +7,11 @@
 #include "SceneMng.h"
 #include <functional>
 #include <type_traits>
+
 int State::_stateCount = 0;
 State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 {
+
 	_id = _stateCount;
 	_stateCount++;
 	
@@ -23,11 +25,11 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	State::_size = std::move(_size);
 
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
-	int id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
+	int id = (rand() % (static_cast<int>(PuyoID::Max) - 3) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 
 	pos_ = { gridMax.x / 2 * blockSize_,blockSize_ * 2 };
-	id = (rand() % (static_cast<int>(PuyoID::Max) - 2) + 1);
+	id = (rand() % (static_cast<int>(PuyoID::Max) - 3) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 	Init();
 
@@ -89,6 +91,7 @@ void State::Draw(void)
 		DrawString(_offset.x + _puyo[0]->Pos().x, _puyo[0]->Pos().y, "0", 0xFFFFFF, true);
 		DrawString(_offset.x + _puyo[1]->Pos().x, _puyo[1]->Pos().y, "1", 0xFFFFFF, true);
 	}
+	nextPuyo_->Draw(_offset);
 	for (auto&& ojyama : _ojyama)
 	{
 		ojyama->Draw();
@@ -101,6 +104,11 @@ void State::Run(void)
 
 	puyoMode_[puyomode_]();
 
+	if (IpSceneMng.frames() % 600 == 0)
+	{
+		InstanceOjyamapuyo();
+	}
+
 
 }
 
@@ -110,7 +118,7 @@ void State::playerCtl(void)
 
 
 	(*controller[conType::Key])();
-	auto Rotemove = [&](sharedPuyo& puyo0, sharedPuyo& puyo1, InputID id) {
+	auto Rotemove = [&](sharePuyo& puyo0, sharePuyo& puyo1, InputID id) {
 		auto pos = _puyo[tagetID]->GetGrid(blockSize_);
 		int CntPos;
 		id == InputID::Btn1 ? CntPos = blockSize_ : CntPos = -blockSize_;
@@ -324,7 +332,7 @@ void State::playerCtl(void)
 
 }
 
-bool State::downCheck(sharedPuyo& puyo)
+bool State::downCheck(sharePuyo& puyo)
 {
 	bool flag = true;
 
@@ -352,15 +360,24 @@ bool State::downCheck(sharedPuyo& puyo)
 
 bool State::InstancePuyo(void)
 {
+	
+
+	//int id = (rand() % (static_cast<int>(PuyoID::Max) -3) + 1);
+
+	//pos_ = { gridMax.x / 2 * blockSize_,blockSize_*1 };
+
+	//id = (rand() % (static_cast<int>(PuyoID::Max) -3) + 1);
+	//_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
+
+
+	auto pickupPuyo = nextPuyo_->pickUp();
+	pickupPuyo.first->Pos(Vector2{ gridMax.x / 2 * blockSize_,blockSize_ });
+	pickupPuyo.second->Pos(Vector2{ gridMax.x / 2 * blockSize_,0 });
+		
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,0 };
-
-	int id = (rand() % (static_cast<int>(PuyoID::Max) - 3) + 1);
-	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
-
+	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), pickupPuyo.first->ID()));
 	pos_ = { gridMax.x / 2 * blockSize_,blockSize_*1 };
-
-	id = (rand() % (static_cast<int>(PuyoID::Max) - 3) + 1);
-	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
+	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), pickupPuyo.second->ID()));
 
 
 	return true;
@@ -424,7 +441,6 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 
 
 	DirCheck(id, pos);
-	//ojyamaCheck();
 
 	if (count < 4)
 	{
@@ -477,7 +493,7 @@ void State::delPuyo(void)
 	_puyo.erase(std::remove_if(
 		_puyo.begin(),
 		_puyo.end(),
-		[](sharedPuyo& obj) {return !(obj)->Alive(); }), _puyo.end());
+		[](sharePuyo& obj) {return !(obj)->Alive(); }), _puyo.end());
 	
 	_ojyama.erase(std::remove_if(
 		_ojyama.begin(),
@@ -492,9 +508,6 @@ void State::Init(void)
 {
 
 
-
-
-
 	_color = 0x000033<<(16*_id);
 	//controller = std::make_unique<KeyInput>();
 	OverFlag = false;
@@ -507,7 +520,42 @@ void State::Init(void)
 	controller[conType::Key]->SetUp(_id);
 	controller[conType::Pad]->SetUp(_id);
 
+	auto pos = _offset + Vector2{ (gridMax.x + 1) * blockSize_,5 * blockSize_ };
+	nextPuyo_ = std::make_unique<NextPuyo>(pos, 3, 1);
 	
+	
+	
+	
+	_dataBase.resize((__int64)gridMax.x * gridMax.y);
+
+	for (size_t no = 0; no < gridMax.y; no++)
+	{
+		_data.emplace_back(&_dataBase[no * gridMax.x]);
+	}
+
+
+	_EraserdataBase.resize((__int64)gridMax.x * gridMax.y);
+
+	for (size_t no = 0; no < gridMax.y; no++)
+	{
+		_Eraserdata.emplace_back(&_EraserdataBase[no * gridMax.x]);
+	}
+
+
+	for (int x = 0; x < gridMax.x; x++)
+	{
+		for (int y = 0; y < gridMax.y; y++)
+		{
+			_data[y][x] = PuyoID::NON;
+			_data[0][x] = PuyoID::•Ç;
+			_data[(__int64)gridMax.y - 1][x] = PuyoID::•Ç;
+			_data[y][0] = PuyoID::•Ç;
+			_data[y][gridMax.x - 1] = PuyoID::•Ç;
+		}
+	}
+
+
+	screenID = MakeScreen(_size.x, _size.y, true);
 
 	puyoMode_.try_emplace(PuyoMode::—Ž‰º, [&]() {
 		
@@ -526,30 +574,61 @@ void State::Init(void)
 
 
 	});
-	
-	
 
 	puyoMode_.try_emplace(PuyoMode::˜A½, [&]() {
+		auto Check = [&](sharedOjyama& ojyama) {
+
+			auto pos = ojyama->GetGrid(blockSize_);
+			if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::NON)
+			{
+				ojyama->Pos(pos * blockSize_);
+
+				_pData._bit.DOWN = 0;
+
+				_data[pos.y][pos.x] = PuyoID::‚¨Ž×–‚‚Õ‚æ;
+
+			}
+			else
+			{
+				return false;
+			}
+		};
 
 
 			bool rennsaFlag = true;
-			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 
 				return rennsaFlag &= downCheck(puyo);
 			});
-			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
 
-				if (!puyo->Run(4))
+			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
+
+				if (!puyo->Run(8))
+				{
+					rennsaFlag = false;
+				}
+
+			});
+
+			std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
+
+				return rennsaFlag &= Check(ojyama);
+			});
+
+			std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
+
+				if (!ojyama->Run(8))
 				{
 					rennsaFlag = false;
 				}
 
 
-			
+
 
 			});
-	
-			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+
+
+			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 
 				return rennsaFlag &= downCheck(puyo);
 
@@ -573,7 +652,7 @@ void State::Init(void)
 	
 
 		bool Flag = true;
-		std::function<bool (sharedPuyo& puyo)> test = [&](sharedPuyo& puyo) {
+		std::function<bool (sharePuyo& puyo)> test = [&](sharePuyo& puyo) {
 			auto Pos = _puyo[tagetID]->GetGrid(blockSize_);
 			//if (_data[Pos.y+1][Pos.x]!= PuyoID::NON)
 			{
@@ -612,7 +691,7 @@ void State::Init(void)
 
 			return !(id == _data[vec.y][vec.x]);
 		};
-		auto check = [&](sharedPuyo& puyo) {
+		auto check = [&](sharePuyo& puyo) {
 		
 			_drawData._bit = { 1,1,1,1 };
 			auto Pos = puyo->GetGrid(blockSize_);
@@ -627,7 +706,7 @@ void State::Init(void)
 		
 		};
 
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 
 			return flag &= check(puyo);
 
@@ -647,7 +726,7 @@ void State::Init(void)
 		
 		bool Flag = true;
 
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 			auto pos = puyo->GetGrid(blockSize_);
 			auto id = puyo->ID();
 
@@ -655,9 +734,18 @@ void State::Init(void)
 			{
 				if (SetEraser(id, pos))
 				{
-					std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+					std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 
 						auto pos = puyo->GetGrid(blockSize_);
+
+						_data[pos.y][pos.x] = PuyoID::NON;
+						StartJoypadVibration(DX_INPUT_PAD1, 1000, 200);
+
+
+					});
+					std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
+
+						auto pos = ojyama->GetGrid(blockSize_);
 
 						_data[pos.y][pos.x] = PuyoID::NON;
 						StartJoypadVibration(DX_INPUT_PAD1, 1000, 200);
@@ -671,7 +759,7 @@ void State::Init(void)
 
 		delPuyo();
 
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 
 			return Flag &= downCheck(puyo);
 
@@ -695,8 +783,8 @@ void State::Init(void)
 
 
 		auto Check = [&](sharedOjyama& ojyama) {
-				auto pos = ojyama->GetGrid(blockSize_);
-
+				
+			auto pos = ojyama->GetGrid(blockSize_);
 			if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::NON)
 			{			
 				ojyama->Pos(pos* blockSize_);
@@ -715,10 +803,14 @@ void State::Init(void)
 
 		bool rennsaFlag = true;
 
+		std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
+
+			return rennsaFlag &= Check(ojyama);
+		});
 
 		std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
 
-			if (!ojyama->Run(4))
+			if (!ojyama->Run(8))
 			{
 				rennsaFlag = false;
 			}
@@ -727,10 +819,12 @@ void State::Init(void)
 
 
 		});
+
 		std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
 
 			return rennsaFlag &= Check(ojyama);
 		});
+
 
 		if (rennsaFlag)
 		{
@@ -759,7 +853,7 @@ void State::Init(void)
 		};
 
 
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharedPuyo& puyo) {
+		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 		//	for (int x = 0; x < gridMax.x; x++)
 			{
 				if (puyo->Pos().y < 50)
@@ -784,46 +878,7 @@ void State::Init(void)
 
 	});
 
-	_dataBase.resize((__int64)gridMax.x * gridMax.y);
 
-	for (size_t no = 0; no < gridMax.y; no++)
-	{
-		_data.emplace_back(&_dataBase[no * gridMax.x]);
-	}
-
-	
-	_EraserdataBase.resize((__int64)gridMax.x * gridMax.y);
-
-	for (size_t no = 0; no < gridMax.y; no++)
-	{
-		_Eraserdata.emplace_back(&_EraserdataBase[no * gridMax.x]);
-	}
-	
-
-	for (int x = 0; x < gridMax.x;x++)
-	{
-		for (int y = 0; y < gridMax.y; y++)
-		{
-			_data[y][x] = PuyoID::NON;
-			_data[0][x] = PuyoID::•Ç;
-			_data[(__int64)gridMax.y-1][x] = PuyoID::•Ç;
-			_data[y][0] = PuyoID::•Ç;
-			_data[y][gridMax.x-1] = PuyoID::•Ç;
-
-
-			//_data[y][x].reset();
-			//_data[0][x](PuyoID::•Ç);
-			//_d
-			//_data[(__int64)gridMax.y - 1][x] = PuyoID::•Ç;
-			//_data[y][0] = PuyoID::•Ç;
-			//_data[y][gridMax.x - 1] = PuyoID::•Ç;
-		}
-	}
-	//dataBase[0] = 100;
-
-	//TRACE("%d\n", dataBase[0]);
-
-	screenID = MakeScreen(_size.x, _size.y, true);
 
 
 
