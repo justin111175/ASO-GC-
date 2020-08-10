@@ -4,7 +4,8 @@
 #include "common/TimeCount.h"
 #include <time.h>
 #include "common/_debug/_DebugDispOut.h"
-
+#include "EffectMng.h"
+#include <EffekseerForDxlib.h>
 
 SceneMng* SceneMng::sInstance = nullptr;
 
@@ -22,6 +23,8 @@ void SceneMng::Run(void)
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
 		_dbgAddDraw();
+		
+		//IpEffect.Draw();
 
 		_activeScene = (*_activeScene).Update(std::move(_activeScene));
 		_timeCount.Run();
@@ -41,16 +44,22 @@ const int SceneMng::frames(void) const
 
 bool SceneMng::SysInit(void)
 {
-	SetWindowText("ぷよぷよ");											// タイトルバー
+	SetWindowText("1916229_YANG CHIHCHENG ぷよぷよ");											// タイトルバー
 	SetGraphMode(ScreenSize.x, ScreenSize.y, 16);
 	ChangeWindowMode(true);												// ture:window false:フルスクリーン
+	
+	
+	
 	if (DxLib_Init() == -1)												// DXラリブラリの初期化
 	{
 		return false;
 	}
-	_dbgSetup(215,215,215);												// debug用色の透明度
+
+	_dbgSetup(ScreenSize.x, ScreenSize.y,215);												// debug用色の透明度
 
 	srand((unsigned)time(NULL));										// 時間から乱数生成
+	
+	IpEffect.Init(Vector2(ScreenSize.x, ScreenSize.y));
 
 	return true;
 
@@ -66,5 +75,6 @@ SceneMng::SceneMng():
 	ScreenSize(1280,800)
 {
 	_frames = 0;
+
 
 }

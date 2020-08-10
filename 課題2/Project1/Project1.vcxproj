@@ -78,8 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(DXLIB_DIR);$(SolutionDir);$(SolutionDir)\common;$(SolutionDir)\common\Input;$(SolutionDir)\common\_debug;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXLIB_DIR);$(SolutionDir);$(SolutionDir)\common;$(SolutionDir)\common\Input;$(SolutionDir)\common\_debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\EffekseerForDXLib_152j_321f\EffekseerForDXLib_152j_321f\プロジェクトに追加すべきファイル_VC用;$(SolutionDir);$(SolutionDir)\common;$(SolutionDir)\common\Input;$(SolutionDir)\common\_debug;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\EffekseerForDXLib_152j_321f\EffekseerForDXLib_152j_321f\プロジェクトに追加すべきファイル_VC用;$(SolutionDir);$(SolutionDir)\common;$(SolutionDir)\common\Input;$(SolutionDir)\common\_debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -119,11 +119,14 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -147,6 +150,7 @@
     <ClCompile Include="common\TimeCount.cpp" />
     <ClCompile Include="common\_debug\_DeBugConOut.cpp" />
     <ClCompile Include="common\_debug\_DebugDispOut.cpp" />
+    <ClCompile Include="EffectMng.cpp" />
     <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="common\Input\KeyInput.cpp" />
@@ -167,6 +171,7 @@
     <ClInclude Include="common\_debug\_DeBugConOut.h" />
     <ClInclude Include="common\Input\Controller.h" />
     <ClInclude Include="common\_debug\_DebugDispOut.h" />
+    <ClInclude Include="EffectMng.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="common\Input\KeyInput.h" />

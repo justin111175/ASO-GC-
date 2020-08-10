@@ -23,7 +23,7 @@ void Puyo::Draw(Vector2 offset)
 {
 	//DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, color_, true);
 	DrawOval(pos_.x+_size.x / 2+offset.x,
-		pos_.y+ _size.y/2  +24* puyoPos_,
+		pos_.y+ _size.y/2  +24* puyoPos_+ offset.y,
 		_size.x/2,
 		(_size.y/2), color_, true);
 	
@@ -31,34 +31,34 @@ void Puyo::Draw(Vector2 offset)
 	if (!_drawData._bit.LEFT)
 	{
 		DrawBox(pos_.x + offset.x, 
-			pos_.y + 24 * sin(_cnt / 10.0),
+			pos_.y + 24 * sin(_cnt / 10.0) + offset.y,
 			pos_.x + _size.x / 2 + offset.x, 
-			pos_.y + _size.y + 24 * sin(_cnt / 10.0), color_, true);
+			pos_.y + _size.y + 24 * sin(_cnt / 10.0) + offset.y, color_, true);
 	}
 	//âE
 	if (!_drawData._bit.RIGHT)
 	{
 		DrawBox(pos_.x + _size.x/2 + offset.x, 
-			pos_.y + 24 * sin(_cnt / 10.0),
+			pos_.y + 24 * sin(_cnt / 10.0) + offset.y,
 			pos_.x + _size.x  + offset.x, 
-			pos_.y + _size.y + 24 * sin(_cnt / 10.0), color_, true);
+			pos_.y + _size.y + 24 * sin(_cnt / 10.0) + offset.y, color_, true);
 	}
 
 	//è„
 	if (!_drawData._bit.UP )
 	{
 		DrawBox(pos_.x + offset.x, 
-			pos_.y + 24 * sin(_cnt / 10.0),
+			pos_.y + 24 * sin(_cnt / 10.0) + offset.y,
 			pos_.x + _size.x + offset.x, 
-			pos_.y + _size.y / 2 + 24 * sin(_cnt / 10.0), color_, true);
+			pos_.y + _size.y / 2 + 24 * sin(_cnt / 10.0) + offset.y, color_, true);
 	}
 	//â∫
 	if (!_drawData._bit.DOWN)
 	{
 		DrawBox(pos_.x + offset.x,
-			pos_.y + _size.y / 2 + 24 * sin(_cnt / 10.0),
+			pos_.y + _size.y / 2 + 24 * sin(_cnt / 10.0) + offset.y,
 			pos_.x + _size.x + offset.x,
-			pos_.y + _size.y + 24 * sin(_cnt / 10.0), color_, true);
+			pos_.y + _size.y + 24 * sin(_cnt / 10.0) + offset.y, color_, true);
 	}
 }
 

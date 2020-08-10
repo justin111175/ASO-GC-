@@ -7,7 +7,7 @@
 #include "SceneMng.h"
 #include <functional>
 #include <type_traits>
-
+#include "EffectMng.h"
 int State::_stateCount = 0;
 State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 {
@@ -23,6 +23,14 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	//		所有権を移動します。std::moveは、C++11で追加されました。std::moveは、キャストの１つです。
 	State::_offset =std::move(_offset);
 	State::_size = std::move(_size);
+	
+	
+	auto pos = Vector2(600,50);
+
+	nextPuyo_ = std::make_unique<NextPuyo>(pos, 3, 1);
+
+
+	Init();
 
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 	int id = (rand() % (static_cast<int>(PuyoID::Max) - 3) + 1);
@@ -31,7 +39,6 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	pos_ = { gridMax.x / 2 * blockSize_,blockSize_ * 2 };
 	id = (rand() % (static_cast<int>(PuyoID::Max) - 3) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
-	Init();
 
 }
 
@@ -75,7 +82,7 @@ void State::Draw(void)
 			}
 			if (_data[y][x] != PuyoID::NON)
 			{
-				DrawFormatString(_offset.x + x * blockSize_, (y) * blockSize_, 0xFFFFF, "%d\n",static_cast<int>(_data[y][x]));
+				DrawFormatString(_offset.x + x * blockSize_, _offset.y+(y) * blockSize_, 0xFFFFF, "%d\n",static_cast<int>(_data[y][x]));
 
 			}
 
@@ -88,9 +95,10 @@ void State::Draw(void)
 	for (auto&& puyo : _puyo)
 	{
 		puyo->Draw(_offset);
-		DrawString(_offset.x + _puyo[0]->Pos().x, _puyo[0]->Pos().y, "0", 0xFFFFFF, true);
-		DrawString(_offset.x + _puyo[1]->Pos().x, _puyo[1]->Pos().y, "1", 0xFFFFFF, true);
+		DrawString(_offset.x + _puyo[0]->Pos().x, _offset.y+ _puyo[0]->Pos().y, "0", 0xFFFFFF, true);
+		DrawString(_offset.x + _puyo[1]->Pos().x, _offset.y+ _puyo[1]->Pos().y, "1", 0xFFFFFF, true);
 	}
+
 	nextPuyo_->Draw(_offset);
 	for (auto&& ojyama : _ojyama)
 	{
@@ -104,11 +112,11 @@ void State::Run(void)
 
 	puyoMode_[puyomode_]();
 
-	if (IpSceneMng.frames() % 600 == 0)
-	{
-		InstanceOjyamapuyo();
-	}
-
+	//if (IpSceneMng.frames() % 600 == 0)
+	//{
+	//	InstanceOjyamapuyo();
+	//}
+	//IpEffect.StopAll();
 
 }
 
@@ -212,50 +220,10 @@ void State::playerCtl(void)
 	};
 	for (auto data : controller[conType::Key]->GetCntData())
 	{
-		if (data.first != InputID::Down)
-		{	
-			if (data.first == InputID::テスト用)
-			{
-				if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-				{
-					InstanceOjyamapuyo();
-				}
-
-			}
-			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-			{
-				if ((data.first != InputID::Btn1)&& (data.first != InputID::Btn2))
-				{
-					auto RLcheck = [&](int tagetID) {
-						auto pos = _puyo[tagetID]->GetGrid(blockSize_);
-						if (_data[pos.y][pos.x + 1] != PuyoID::NON)
-						{
-							_pData._bit.RIGHT = 0;
-						}
-						if (_data[pos.y][pos.x - 1] != PuyoID::NON)
-						{
-							_pData._bit.LEFT = 0;
-						}
-
-					};
-					RLcheck(tagetID);
-					RLcheck(tagetID ^ 1);
-					for (int i=0;i<2;i++)
-					{
-						_puyo[i]->SetPData(_pData._bit);
-						_puyo[i]->Move(data.first);
-					}
-				}
-				else
-				{
-					Rotemove(_puyo[tagetID], _puyo[tagetID^1],data.first);
-				}
-			}
-		}
-		else
+		switch (data.first)
 		{
-
-
+		case InputID::Down:
+			
 			if (data.second[static_cast<int>(Trg::Now)])
 			{
 				for (int i = 0; i < 2; i++)
@@ -271,15 +239,16 @@ void State::playerCtl(void)
 					_puyo[i]->Move(data.first);
 				}
 			}
-		}
-	}
+			
+			break;
+		case InputID::テスト用:
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+				IpEffect.Play("puyo", Vector2(400, 400), { 0,0 });
 
-	(*controller[conType::Pad])();
-
-	for (auto data : controller[conType::Pad]->GetCntData(_id))
-	{
-		if (data.first != InputID::Down)
-		{
+			}
+			break;
+		default:
 			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
 			{
 				if ((data.first != InputID::Btn1) && (data.first != InputID::Btn2))
@@ -309,9 +278,20 @@ void State::playerCtl(void)
 					Rotemove(_puyo[tagetID], _puyo[tagetID ^ 1], data.first);
 				}
 			}
+
+			break;
 		}
-		else
+
+	}
+
+	(*controller[conType::Pad])();
+
+	for (auto data : controller[conType::Pad]->GetCntData(_id))
+	{
+		switch (data.first)
 		{
+		case InputID::Down:
+
 			if (data.second[static_cast<int>(Trg::Now)])
 			{
 				for (int i = 0; i < 2; i++)
@@ -327,6 +307,46 @@ void State::playerCtl(void)
 					_puyo[i]->Move(data.first);
 				}
 			}
+
+			break;
+		case InputID::テスト用:
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+				InstanceOjyamapuyo();
+			}
+			break;
+		default:
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+				if ((data.first != InputID::Btn1) && (data.first != InputID::Btn2))
+				{
+					auto RLcheck = [&](int tagetID) {
+						auto pos = _puyo[tagetID]->GetGrid(blockSize_);
+						if (_data[pos.y][pos.x + 1] != PuyoID::NON)
+						{
+							_pData._bit.RIGHT = 0;
+						}
+						if (_data[pos.y][pos.x - 1] != PuyoID::NON)
+						{
+							_pData._bit.LEFT = 0;
+						}
+
+					};
+					RLcheck(tagetID);
+					RLcheck(tagetID ^ 1);
+					for (int i = 0; i < 2; i++)
+					{
+						_puyo[i]->SetPData(_pData._bit);
+						_puyo[i]->Move(data.first);
+					}
+				}
+				else
+				{
+					Rotemove(_puyo[tagetID], _puyo[tagetID ^ 1], data.first);
+				}
+			}
+
+			break;
 		}
 	}
 
@@ -451,14 +471,13 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 	else
 	{
 		
-
 		for (auto&& puyo : _puyo)
 		{
 			auto pos = puyo->GetGrid(blockSize_);
 			if (_data[pos.y][pos.x] == _Eraserdata[pos.y][pos.x])
 			{
 
-	
+				IpEffect.Play("puyo", puyo->Pos(), _offset);
 				_data[pos.y][pos.x] = PuyoID::NON;
 				puyo->Alive(false);
 
@@ -520,9 +539,6 @@ void State::Init(void)
 	controller[conType::Key]->SetUp(_id);
 	controller[conType::Pad]->SetUp(_id);
 
-	auto pos = _offset + Vector2{ (gridMax.x + 1) * blockSize_,5 * blockSize_ };
-	nextPuyo_ = std::make_unique<NextPuyo>(pos, 3, 1);
-	
 	
 	
 	
@@ -843,26 +859,26 @@ void State::Init(void)
 
 		bool Flag = false;
 
-		auto check = [&]() {
-			if (_data[1][5]!=PuyoID::NON)
+		//auto check = [&]() {
+		//	if (_data[1][5]!=PuyoID::NON)
+		//	{
+		//		return  true;
+		//	}
+		//	return false;
+
+		//};
+
+
+		std::for_each(_puyo.begin(), _puyo.end(), [&](sharePuyo& puyo)
+		{
 			{
-				return  true;
-			}
-			return false;
-
-		};
-
-
-		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
-		//	for (int x = 0; x < gridMax.x; x++)
-			{
-				if (puyo->Pos().y < 50)
+				if (puyo->Pos().y < 100)
 				{
 					return Flag = true;
 				}
 			}
 		});
-		// Flag |= check();
+
 		if (!Flag)
 		{
 			InstancePuyo();
