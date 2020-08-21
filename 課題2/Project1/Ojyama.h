@@ -8,7 +8,7 @@ public:
 	Ojyama(Vector2&& pos, PuyoID id);
 	~Ojyama();
 	bool Run(int no);
-	void Draw(void);
+	void Draw(Vector2 offset);
 
 	virtual const Vector2 GetGrid(int size);
 

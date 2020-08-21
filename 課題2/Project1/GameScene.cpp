@@ -1,10 +1,10 @@
 #include <Dxlib.h>
 #include <_DeBugConOut.h>
 #include <GameScene.h>
+#include "TitleScene.h"
 #include <Vector2.h>
 #include <SceneMng.h>
 #include <utility>
-#include "GameOver.h"
 #include "EffectMng.h"
 GameScene::GameScene()
 {	
@@ -14,6 +14,7 @@ GameScene::GameScene()
 
 	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(800,50)), std::move(Vector2(700+800, 722))));
 
+	cnt_ = 100;
 
 }
 
@@ -26,19 +27,47 @@ GameScene::~GameScene()
 unique_Base GameScene::Update(unique_Base own)
 {
 	Draw();
-	
+
 	// 無返事参照、const参照、shared_ptr三つの方法がある
-	for (auto&& state : playerState)
+	if (cnt_ <= 0)
 	{
-		state->Run();
-		if (state->OverFlag)
+		for (auto&& state : playerState)
 		{
-			return std::make_unique<GameOver>();
+			if (!state->OverFlag)
+			{
+				state->Run();
+
+			}
+			else
+			{
+				if (CheckHitKey(KEY_INPUT_SPACE))
+				{
+					return std::make_unique<TitleScene>();
+
+				}
+			}
+
 
 		}
+		if (playerState[0]->OverFlag)
+		{
+			playerState[1]->OverFlag = true;
+		}
+		if (playerState[1]->OverFlag)
+		{
+			playerState[0]->OverFlag = true;
+		}
+	}
+	else
+	{
+		cnt_--;
 
 	}
+
+
+
 	IpEffect.Updata();
+
 
 
 

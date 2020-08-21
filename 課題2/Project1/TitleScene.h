@@ -2,18 +2,20 @@
 #include "BaseScene.h"
 #include "common/Input/Controller.h"
 
-class GameOver :
+
+class TitleScene :
     public BaseScene
 {
 public:
-	GameOver();
-	~GameOver();
+	TitleScene();
+	~TitleScene();
 	unique_Base Update(unique_Base own) override;					// çXêV
 
-	std::map<conType, std::unique_ptr<Controller>> controller;
+
 
 private:
-
 	void Draw(void);
+	std::map<conType, std::unique_ptr<Controller>> controller;
+	int cnt_;
 };
 

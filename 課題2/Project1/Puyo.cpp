@@ -175,7 +175,7 @@ bool Puyo::Cnt(double cnt)
 bool Puyo::puyo(void)
 {
 
-	if (test_ == test::puyo)
+	if (puyoMode_ == PuyonState::puyo)
 	{
 		if (_cnt < 30)
 		{
@@ -186,7 +186,7 @@ bool Puyo::puyo(void)
 		}
 		else
 		{
-			test_ == test::stay;
+			puyoMode_ == PuyonState::stay;
 			return true;
 		}
 
@@ -204,10 +204,16 @@ const Vector2 Puyo::GetGrid(int size)
 	return Vector2{ pos_.x / size,(pos_.y) / size };
 }
 
+void Puyo::SetPuyoCnt(void)
+{
+	//puyoCnt_=
+}
+
 void Puyo::Init(void)
 {
 	_drawData._bit = { 1,1,1,1 };
-	test_ = test::stay;
+	puyoCnt_ = 0;
+	puyoMode_ = PuyonState::stay;
 	_alive = true;
 	_dropCnt = 0;
 	_dropInt = 20;

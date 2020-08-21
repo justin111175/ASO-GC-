@@ -19,7 +19,7 @@ enum class PuyoID
 	Max
 };
 
-enum class test
+enum class PuyonState
 {
 	stay,
 	puyo
@@ -46,7 +46,7 @@ class Puyo
 public:
 	Puyo(Vector2&& pos, PuyoID id);
 	~Puyo();
-	test test_;
+	PuyonState puyoMode_;
 	void Draw(Vector2 offset);
 	bool Run(int no);
 	void Move(InputID id);
@@ -69,7 +69,7 @@ public:
 	Permit_Data _drawData;
 
 	virtual const Vector2 GetGrid(int size);
-
+	void SetPuyoCnt(void);
 private:
 	double _cnt;
 	bool _alive;
@@ -84,7 +84,7 @@ private:
 
 	PuyoID id_;
 	double puyoPos_;
-
+	int puyoCnt_;
 };
 
 using sharePuyo = std::shared_ptr<Puyo>;

@@ -1,6 +1,7 @@
 #include "SceneMng.h"
 #include "common/Vector2.h"
 #include "GameScene.h"
+#include "TitleScene.h"
 #include "common/TimeCount.h"
 #include <time.h>
 #include "common/_debug/_DebugDispOut.h"
@@ -24,7 +25,6 @@ void SceneMng::Run(void)
 	{
 		_dbgAddDraw();
 		
-		//IpEffect.Draw();
 
 		_activeScene = (*_activeScene).Update(std::move(_activeScene));
 		_timeCount.Run();

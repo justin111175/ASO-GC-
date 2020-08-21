@@ -17,6 +17,7 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	
 	tagetID = 0;
 
+	winFlag_ = PlayState::Win;
 
 	// move:
 	//		引数で与えられたオブジェクトの持つリソースを左辺へオブジェクトに移動する機能を提供します。
@@ -40,6 +41,7 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	id = (rand() % (static_cast<int>(PuyoID::Max) - 3) + 1);
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 
+	LoadDivGraph("image/over.png", 2, 1, 2, 260, 150, overImage_);
 }
 
 State::~State()
@@ -67,19 +69,19 @@ void State::Draw(void)
 	{
 		for (int y=0; y< gridMax.y;y++)
 		{
-			//if (_data[y][x] == PuyoID::壁)
-			//{
-			//	DrawBox(_offset.x + x * blockSize_, _offset.y + y * blockSize_,
-			//		_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFFFFFF, true);
-
-			//}
-
-			if (_Eraserdata[y][x]!= PuyoID::NON)
+			if (_data[y][x] == PuyoID::壁)
 			{
-				DrawBox(_offset.x +x * blockSize_, _offset.y + y * blockSize_,
-					_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFF00FF, true);
+				DrawBox(_offset.x + x * blockSize_, _offset.y + y * blockSize_,
+					_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFFFFFF, true);
 
 			}
+
+			//if (_Eraserdata[y][x]!= PuyoID::NON)
+			//{
+			//	DrawBox(_offset.x +x * blockSize_, _offset.y + y * blockSize_,
+			//		_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFF00FF, true);
+
+			//}
 			if (_data[y][x] != PuyoID::NON)
 			{
 				DrawFormatString(_offset.x + x * blockSize_, _offset.y+(y) * blockSize_, 0xFFFFF, "%d\n",static_cast<int>(_data[y][x]));
@@ -102,7 +104,14 @@ void State::Draw(void)
 	nextPuyo_->Draw(_offset);
 	for (auto&& ojyama : _ojyama)
 	{
-		ojyama->Draw();
+		ojyama->Draw(_offset);
+	}
+
+	if (OverFlag)
+	{
+		//SetFontSize(30);
+		DrawGraph(_offset.x+60 , _offset.y+200, overImage_[static_cast<int>(winFlag_)], true);
+
 	}
 
 }
@@ -112,11 +121,7 @@ void State::Run(void)
 
 	puyoMode_[puyomode_]();
 
-	//if (IpSceneMng.frames() % 600 == 0)
-	//{
-	//	InstanceOjyamapuyo();
-	//}
-	//IpEffect.StopAll();
+
 
 }
 
@@ -125,7 +130,6 @@ void State::playerCtl(void)
 	_pData._bit = { 1,1,1,1 };
 
 
-	(*controller[conType::Key])();
 	auto Rotemove = [&](sharePuyo& puyo0, sharePuyo& puyo1, InputID id) {
 		auto pos = _puyo[tagetID]->GetGrid(blockSize_);
 		int CntPos;
@@ -244,7 +248,9 @@ void State::playerCtl(void)
 		case InputID::テスト用:
 			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
 			{
-				IpEffect.Play("puyo", Vector2(400, 400), { 0,0 });
+				
+
+				InstanceOjyamapuyo();
 
 			}
 			break;
@@ -275,6 +281,7 @@ void State::playerCtl(void)
 				}
 				else
 				{
+
 					Rotemove(_puyo[tagetID], _puyo[tagetID ^ 1], data.first);
 				}
 			}
@@ -283,6 +290,7 @@ void State::playerCtl(void)
 		}
 
 	}
+	(*controller[conType::Key])();
 
 	(*controller[conType::Pad])();
 
@@ -360,11 +368,14 @@ bool State::downCheck(sharePuyo& puyo)
 
 	if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::NON)
 	{
+		if(_data[(__int64)pos.y][pos.x] != PuyoID::壁)
+		{		
+			puyo->Pos(pos * blockSize_);
 
-		puyo->Pos(pos * blockSize_);
+			_pData._bit.DOWN = 0;
+			_data[pos.y][pos.x] = puyo->ID();
+		}
 
-		_pData._bit.DOWN = 0;
-		_data[pos.y][pos.x] = puyo->ID();
 
 	}
 	else
@@ -394,9 +405,9 @@ bool State::InstancePuyo(void)
 	pickupPuyo.first->Pos(Vector2{ gridMax.x / 2 * blockSize_,blockSize_ });
 	pickupPuyo.second->Pos(Vector2{ gridMax.x / 2 * blockSize_,0 });
 		
-	Vector2 pos_ = { gridMax.x / 2 * blockSize_,0 };
+	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ * 1 };
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), pickupPuyo.first->ID()));
-	pos_ = { gridMax.x / 2 * blockSize_,blockSize_*1 };
+	pos_ = { gridMax.x / 2 * blockSize_,blockSize_*2 };
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), pickupPuyo.second->ID()));
 
 
@@ -405,7 +416,7 @@ bool State::InstancePuyo(void)
 
 bool State::InstanceOjyamapuyo(void)
 {
-	Vector2 pos_ = { gridMax.x / 2 * blockSize_,0 };
+	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 	_ojyama.emplace(_ojyama.begin(), std::make_shared<Ojyama>(std::move(pos_), PuyoID::お邪魔ぷよ));
 	return true;
 
@@ -413,11 +424,8 @@ bool State::InstanceOjyamapuyo(void)
 
 bool State::SetEraser(PuyoID id,Vector2 pos)
 {
-
-
 	memset(_EraserdataBase.data(), 0, _EraserdataBase.size() * sizeof(PuyoID));
 	int count = 0;
-
 
 	std::function<void(PuyoID id, Vector2 vec)> DirCheck = [&](PuyoID id, Vector2 vec) {
 
@@ -581,10 +589,34 @@ void State::Init(void)
 		_puyo[tagetID]->Run(1);
 		_puyo[tagetID^1]->Run(1);
 
+		//bool drop = false;
+		//std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
+
+		//	puyo->Run(1);
+		//});
+
+		//std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
+
+		//	return drop |= downCheck(puyo);
+		//});
+
 		if (downCheck(_puyo[tagetID^1])|| downCheck(_puyo[tagetID]))
 		{
+			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
+				auto pos = puyo->GetGrid(blockSize_);
+
+				if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::壁)
+				{
+
+					puyo->puyoMode_ = PuyonState::puyo;
+					puyo->Cnt(0);
+				}
+			});
+
 			puyomode_ = PuyoMode::ぷよ;
 		}
+
+
 
 
 
@@ -668,29 +700,48 @@ void State::Init(void)
 	
 
 		bool Flag = true;
-		std::function<bool (sharePuyo& puyo)> test = [&](sharePuyo& puyo) {
-			auto Pos = _puyo[tagetID]->GetGrid(blockSize_);
-			//if (_data[Pos.y+1][Pos.x]!= PuyoID::NON)
+		std::function<bool (sharePuyo& puyo)> PuyonState = [&](sharePuyo& puyo) {
+
+
+			auto pos = puyo->GetGrid(blockSize_);
+
+			//if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::壁)
 			{
-				puyo->test_ = test::puyo;
 				if (puyo->puyo())
 				{
+					
 					return true;
 				}
+				
 			}
+			//else
+			//{
+			//	return true;
+			//}
 
 			return  false;
 
 
 		};
 
-		Flag &= (test(_puyo[tagetID])|| test(_puyo[tagetID^1]));
 
+
+		Flag &= (PuyonState(_puyo[tagetID])|| PuyonState(_puyo[tagetID^1]));
+
+		//std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
+
+		//	return Flag &= PuyonState(puyo);
+
+		//});
 
 		if (Flag)
 		{
-			_puyo[tagetID]->Cnt(0);
-			_puyo[tagetID^1]->Cnt(0);
+
+			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
+
+				puyo->Cnt(0);
+
+			});
 			puyomode_ = PuyoMode::連鎖;
 			
 		}
@@ -871,12 +922,13 @@ void State::Init(void)
 
 		std::for_each(_puyo.begin(), _puyo.end(), [&](sharePuyo& puyo)
 		{
+			auto pos = puyo->GetGrid(blockSize_);
+			if (pos.y - 1<=0)
 			{
-				if (puyo->Pos().y < 100)
-				{
-					return Flag = true;
-				}
+				return Flag = true;
 			}
+
+			
 		});
 
 		if (!Flag)
@@ -887,6 +939,7 @@ void State::Init(void)
 		}
 		else
 		{
+			winFlag_ = PlayState::Lose;
 			OverFlag = true;
 		}
 

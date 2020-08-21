@@ -24,10 +24,11 @@ bool Ojyama::Run(int no)
 	return true;
 }
 
-void Ojyama::Draw(void)
+void Ojyama::Draw(Vector2 offset)
 {	
-	DrawOval(pos_.x + size_.x / 2,
-		pos_.y + size_.y / 2 ,
+
+	DrawOval(pos_.x + size_.x / 2 + offset.x,
+		pos_.y + size_.y / 2  + offset.y,
 		size_.x / 2,
 		(size_.y / 2), 0xFFFFFF, true);
 

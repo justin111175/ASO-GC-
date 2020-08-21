@@ -48,9 +48,6 @@
     <ClCompile Include="common\_debug\_DebugDispOut.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="GameOver.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Ojyama.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -58,6 +55,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="EffectMng.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,9 +107,6 @@
     <ClInclude Include="common\_debug\_DebugDispOut.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="GameOver.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Ojyama.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -117,6 +114,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="EffectMng.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

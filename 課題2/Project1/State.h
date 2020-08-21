@@ -18,10 +18,15 @@ enum class PuyoMode
 	オーバーチェック,
 	MAX
 };
+enum class PlayState
+{
+	Win,
+	Lose,
+	MAX
+};
 
 
 using sharedOjyama = std::shared_ptr<Ojyama>;
-
 
 class State
 {
@@ -34,6 +39,7 @@ public:
 	void Run(void);
 	
 	bool OverFlag;
+	PlayState winFlag_;
 
 
 
@@ -75,7 +81,8 @@ private:
 	int _id;
 	int _color;
 	int tagetID;
-
+	
+	int overImage_[2];
 protected:
 
 	std::map<PuyoMode,std::function<void(void)>> puyoMode_;

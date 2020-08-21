@@ -14,7 +14,7 @@ public:
 
 
 private:
-
+	int cnt_;
 	void Draw(void);
 	
 	std::vector <std::unique_ptr<State>> playerState;
