@@ -56,7 +56,7 @@ bool EffectMng::Init(Vector2&& size)
 
 int EffectMng::GetHandle(std::string name)
 {
-	handles.try_emplace(name, LoadEffekseerEffect(("effect/" + name + ".efk").c_str(), 10.0f));
+	handles.try_emplace(name, LoadEffekseerEffect(("effect/" + name + ".efk").c_str(), 20.0f));
 	return handles[name];
 }
 

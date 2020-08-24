@@ -8,7 +8,6 @@
 #include "BaseScene.h"
 
 #define IpSceneMng SceneMng::GetInstance()
-
 class SceneMng
 {
 public:
@@ -37,7 +36,8 @@ public:
 	const Vector2 ScreenSize;									// 全画面サイズ
 
 	const int frames(void)const;								// フレーム数のゲット関数
-
+	
+	int _blendCnt;
 private:
 	static SceneMng* sInstance;									// インスタンス
 	// スマートポインタ
@@ -49,6 +49,7 @@ private:
 	~SceneMng();
 	SceneMng();
 	bool SysInit(void);
+
 
 };
 

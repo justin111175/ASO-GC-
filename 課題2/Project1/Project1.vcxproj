@@ -146,25 +146,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BaseScene.cpp" />
+    <ClCompile Include="Scene\BaseScene.cpp" />
+    <ClCompile Include="common\ImageMng.cpp" />
     <ClCompile Include="common\TimeCount.cpp" />
     <ClCompile Include="common\_debug\_DeBugConOut.cpp" />
     <ClCompile Include="common\_debug\_DebugDispOut.cpp" />
     <ClCompile Include="EffectMng.cpp" />
-    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="common\Input\KeyInput.cpp" />
+    <ClCompile Include="Scene\GameScene2.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="common\Input\PadInput.cpp" />
     <ClCompile Include="NextPuyo.cpp" />
     <ClCompile Include="Ojyama.cpp" />
     <ClCompile Include="Puyo.cpp" />
-    <ClCompile Include="SceneMng.cpp" />
+    <ClCompile Include="Scene\SceneMng.cpp" />
     <ClCompile Include="State.cpp" />
-    <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseScene.h" />
+    <ClInclude Include="Scene\BaseScene.h" />
     <ClInclude Include="common\detail\Vector2.h" />
+    <ClInclude Include="common\ImageMng.h" />
     <ClInclude Include="common\Input\conTypeID.h" />
     <ClInclude Include="common\TimeCount.h" />
     <ClInclude Include="common\Vector2.h" />
@@ -172,16 +175,17 @@
     <ClInclude Include="common\Input\Controller.h" />
     <ClInclude Include="common\_debug\_DebugDispOut.h" />
     <ClInclude Include="EffectMng.h" />
-    <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="common\Input\KeyInput.h" />
     <ClInclude Include="common\Input\InputID.h" />
     <ClInclude Include="common\Input\PadInput.h" />
+    <ClInclude Include="Scene\GameScene2.h" />
     <ClInclude Include="NextPuyo.h" />
     <ClInclude Include="Ojyama.h" />
     <ClInclude Include="Puyo.h" />
-    <ClInclude Include="SceneMng.h" />
+    <ClInclude Include="Scene\SceneMng.h" />
     <ClInclude Include="State.h" />
-    <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="Scene\TitleScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

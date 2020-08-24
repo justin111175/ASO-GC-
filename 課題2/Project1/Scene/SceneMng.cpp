@@ -19,7 +19,7 @@ void SceneMng::Run(void)
 		//AST();
 	}
 
-	_activeScene = std::make_unique<GameScene>();
+	_activeScene = std::make_unique<TitleScene>();
 
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
@@ -38,6 +38,7 @@ const int SceneMng::frames(void) const
 {
     return _frames;
 }
+
 
 
 

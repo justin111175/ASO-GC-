@@ -4,7 +4,7 @@
 #include "common/Input/KeyInput.h"
 #include "common/Input/PadInput.h"
 #include "common/_debug/_DeBugConOut.h"
-#include "SceneMng.h"
+#include "./Scene/SceneMng.h"
 #include <functional>
 #include <type_traits>
 #include "EffectMng.h"
@@ -485,7 +485,7 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 			if (_data[pos.y][pos.x] == _Eraserdata[pos.y][pos.x])
 			{
 
-				IpEffect.Play("puyo", puyo->Pos(), _offset);
+				IpEffect.Play("puyo1", puyo->Pos(), _offset);
 				_data[pos.y][pos.x] = PuyoID::NON;
 				puyo->Alive(false);
 
@@ -705,7 +705,7 @@ void State::Init(void)
 
 			auto pos = puyo->GetGrid(blockSize_);
 
-			//if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::•Ç)
+			if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::•Ç)
 			{
 				if (puyo->puyo())
 				{
@@ -714,10 +714,10 @@ void State::Init(void)
 				}
 				
 			}
-			//else
-			//{
-			//	return true;
-			//}
+			else
+			{
+				return true;
+			}
 
 			return  false;
 

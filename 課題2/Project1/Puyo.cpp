@@ -3,7 +3,7 @@
 #include <utility>
 #include "common/_debug/_DeBugConOut.h"
 #include "common/TimeCount.h"
-#include "SceneMng.h"
+#include "./Scene/SceneMng.h"
 
 
 Puyo::Puyo(Vector2&& pos, PuyoID id)

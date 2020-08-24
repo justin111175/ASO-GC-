@@ -1,35 +1,38 @@
+#include "GameScene2.h"
 #include <Dxlib.h>
 #include <_DeBugConOut.h>
-#include <GameScene.h>
 #include "TitleScene.h"
 #include <Vector2.h>
-#include <SceneMng.h>
+#include "SceneMng.h"
 #include <utility>
 #include "EffectMng.h"
-GameScene::GameScene()
-{	
+#include "../common/ImageMng.h"
+
+GameScene2::GameScene2()
+{
 
 
-	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(100, 50)), std::move(Vector2(700+100, 722))));
+	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(100, 50)), std::move(Vector2(700 + 100, 722))));
 
-	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(800,50)), std::move(Vector2(700+800, 722))));
+	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(800, 50)), std::move(Vector2(700 + 800, 722))));
 
 	cnt_ = 100;
+	IpImageMng.GetID("space", "image/space.png", { 570,40 }, { 1,1 });
 
 }
 
 
-GameScene::~GameScene()
+GameScene2::~GameScene2()
 {
 
 }
 
-unique_Base GameScene::Update(unique_Base own)
+unique_Base GameScene2::Update(unique_Base own)
 {
 	Draw();
 
 	// 無返事参照、const参照、shared_ptr三つの方法がある
-	if (cnt_ <= 0)
+	if (!FadeUpdate())
 	{
 		for (auto&& state : playerState)
 		{
@@ -58,11 +61,7 @@ unique_Base GameScene::Update(unique_Base own)
 			playerState[0]->OverFlag = true;
 		}
 	}
-	else
-	{
-		cnt_--;
 
-	}
 
 
 
@@ -74,7 +73,7 @@ unique_Base GameScene::Update(unique_Base own)
 	return std::move(own);
 }
 
-void GameScene::Draw(void)
+void GameScene2::Draw(void)
 {
 	ClsDrawScreen();
 
@@ -91,14 +90,27 @@ void GameScene::Draw(void)
 	//{
 	//	DrawGraph(0, 0,state->GetScreenId(), true);
 	//}
-	
+
 	DrawGraph(0, 0, playerState[0]->GetScreenId(), true);
-	
+
 	DrawGraph(0, 0, playerState[1]->GetScreenId(), true);
-	
+
+	for (auto&& state : playerState)
+	{
+		if (state->OverFlag)
+		{
+			DrawGraph(350, 500, IMAGE_ID("space")[0], true);
+		}
+	}
 	IpEffect.Draw();
 
+
+	if (IpSceneMng._blendCnt)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, IpSceneMng._blendCnt);
+		DrawGraph(0, 0, IpImageMng.GetID(_fadeType)[0], true);
+		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+	}
 	ScreenFlip();
 
 }
-
