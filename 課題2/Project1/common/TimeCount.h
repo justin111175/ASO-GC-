@@ -16,7 +16,7 @@ public:
 	bool Set(const char* string,bool flag, double cnt);
 
 	const bool GetFlag(const char* string);
-
+	const double GetCnt(const char* string);
 
 private:
 	TimeCount();

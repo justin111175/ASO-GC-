@@ -8,6 +8,7 @@
 #include <functional>
 #include <type_traits>
 #include "EffectMng.h"
+
 int State::_stateCount = 0;
 State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 {
@@ -26,12 +27,24 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	State::_size = std::move(_size);
 	
 	
-	auto pos = Vector2(600,50);
+	if (_id == 0)
+	{
+		auto pos = Vector2(_offset);
+		nextPuyo_ = std::make_unique<NextPuyo>(pos, 3, 1);
+		name_ = "プレイ1";
 
-	nextPuyo_ = std::make_unique<NextPuyo>(pos, 3, 1);
+	}
+	else
+	{
+		auto pos = Vector2(_offset.x- blockSize_*9, _offset.y);
+		nextPuyo_ = std::make_unique<NextPuyo>(pos, 3, 1);
+		name_ = "プレイ2";
+
+	}
 
 
 	Init();
+	number_.Init();
 
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
 	int id = (rand() % (static_cast<int>(PuyoID::Max) - 3) + 1);
@@ -61,20 +74,46 @@ void State::Draw(void)
 	SetDrawScreen(screenID);
 	
 	ClsDrawScreen();
-	
-	DrawBox(_offset.x, _offset.y, _offset.x+ gridMax.x*blockSize_, _offset.y+ gridMax.y*blockSize_, _color, true);
+		
+	ObjDraw();
 
-
-	for (int x=0;x< gridMax.x;x++)
+	if (OverFlag)
 	{
-		for (int y=0; y< gridMax.y;y++)
-		{
-			if (_data[y][x] == PuyoID::壁)
-			{
-				DrawBox(_offset.x + x * blockSize_, _offset.y + y * blockSize_,
-					_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFFFFFF, true);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
+		DrawBox(_offset.x, _offset.y, _offset.x + (gridMax.x) * blockSize_, _offset.y + (gridMax.y) * blockSize_, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 
-			}
+		DrawGraph(_offset.x+60 , _offset.y+200, overImage_[static_cast<int>(winFlag_)], true);
+
+	}
+	number_.Draw({ _offset.x+ blockSize_*7+10,_offset.y+ blockSize_*13+5 }, { 0.3f,0.4f }, score_);
+
+}
+
+void State::ObjDraw(void)
+{
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
+	DrawBox(_offset.x, _offset.y, _offset.x + (gridMax.x) * blockSize_, _offset.y + (gridMax.y) * blockSize_, _color2, true);
+	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+
+	DrawBoxAA(_offset.x, _offset.y, _offset.x + (gridMax.x) * blockSize_, _offset.y + (gridMax.y) * blockSize_, 0xFFFFFF, false, 3.0f);
+
+	DrawBox(_offset.x + blockSize_, _offset.y + blockSize_, _offset.x + (gridMax.x - 1) * blockSize_, _offset.y + (gridMax.y - 1) * blockSize_, _color, true);
+
+	DrawBoxAA(_offset.x + blockSize_, _offset.y + blockSize_, _offset.x + (gridMax.x - 1) * blockSize_, _offset.y + (gridMax.y - 1) * blockSize_, 0xFFFFFF, false, 3.0f);
+
+	DrawString(_offset.x+10, _offset.y+5, name_, 0xFFFFFF);
+
+	for (int x = 1; x < gridMax.x - 1; x++)
+	{
+		for (int y = 1; y < gridMax.y - 1; y++)
+		{
+			//if (_data[y][x] == PuyoID::壁)
+			//{
+			//	DrawBox(_offset.x + x * blockSize_, _offset.y + y * blockSize_,
+			//		_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFFFFFF, true);
+
+			//}
 
 			//if (_Eraserdata[y][x]!= PuyoID::NON)
 			//{
@@ -84,12 +123,12 @@ void State::Draw(void)
 			//}
 			if (_data[y][x] != PuyoID::NON)
 			{
-				DrawFormatString(_offset.x + x * blockSize_, _offset.y+(y) * blockSize_, 0xFFFFF, "%d\n",static_cast<int>(_data[y][x]));
+				DrawFormatString(_offset.x + x * blockSize_, _offset.y + (y)*blockSize_, 0xFFFFF, "%d\n", static_cast<int>(_data[y][x]));
 
 			}
 
-			DrawBox(_offset.x + x * blockSize_, _offset.y + y * blockSize_,
-				_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFFFFFF, false);
+			//DrawBox(_offset.x + x * blockSize_, _offset.y + y * blockSize_,
+			//	_offset.x + (1 + x) * blockSize_, _offset.y + (1 + y) * blockSize_, 0xFFFFFF, false);
 		}
 
 
@@ -97,22 +136,26 @@ void State::Draw(void)
 	for (auto&& puyo : _puyo)
 	{
 		puyo->Draw(_offset);
-		DrawString(_offset.x + _puyo[0]->Pos().x, _offset.y+ _puyo[0]->Pos().y, "0", 0xFFFFFF, true);
-		DrawString(_offset.x + _puyo[1]->Pos().x, _offset.y+ _puyo[1]->Pos().y, "1", 0xFFFFFF, true);
+		DrawString(_offset.x + _puyo[0]->Pos().x, _offset.y + _puyo[0]->Pos().y, "0", 0xFFFFFF, true);
+		DrawString(_offset.x + _puyo[1]->Pos().x, _offset.y + _puyo[1]->Pos().y, "1", 0xFFFFFF, true);
 	}
 
-	nextPuyo_->Draw(_offset);
+
+	nextPuyo_->Draw(_offset, _color2);
+
 	for (auto&& ojyama : _ojyama)
 	{
 		ojyama->Draw(_offset);
 	}
-
-	if (OverFlag)
+	//if (rennsaFlag_)
 	{
-		//SetFontSize(30);
-		DrawGraph(_offset.x+60 , _offset.y+200, overImage_[static_cast<int>(winFlag_)], true);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, _timeCount.GetCnt("連鎖"));
+		DrawFormatString(_offset.x + blockSize_ * 3, _offset.y + blockSize_ * 6, 0xFFFFFF, "%d連鎖", rennsaCnt_);
+
+		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 
 	}
+
 
 }
 
@@ -121,7 +164,20 @@ void State::Run(void)
 
 	puyoMode_[puyomode_]();
 
+	if (rennsaCnt_ >1&&!_timeCount.GetFlag("連鎖"))
+	{
+		rennsaCnt_ = 0;
+	}
 
+
+	//if (!_timeCount.GetFlag("連鎖"))
+	//{
+	//	rennsaCnt_ = 0;
+	//}
+
+
+
+	TRACE("%d\n", rennsaCnt_);
 
 }
 
@@ -403,8 +459,9 @@ bool State::InstancePuyo(void)
 
 	auto pickupPuyo = nextPuyo_->pickUp();
 	pickupPuyo.first->Pos(Vector2{ gridMax.x / 2 * blockSize_,blockSize_ });
-	pickupPuyo.second->Pos(Vector2{ gridMax.x / 2 * blockSize_,0 });
-		
+	pickupPuyo.second->Pos(Vector2{ gridMax.x / 2 * blockSize_,blockSize_*1 });
+	
+
 	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ * 1 };
 	_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), pickupPuyo.first->ID()));
 	pos_ = { gridMax.x / 2 * blockSize_,blockSize_*2 };
@@ -488,6 +545,7 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 				IpEffect.Play("puyo1", puyo->Pos(), _offset);
 				_data[pos.y][pos.x] = PuyoID::NON;
 				puyo->Alive(false);
+				score_ = score_ + count * 100;
 
 			}
 
@@ -531,11 +589,14 @@ void State::delPuyo(void)
 
 
 
+
+
 void State::Init(void)
 {
 
 
 	_color = 0x000033<<(16*_id);
+	_color2 = 0x0000AA<<(16*_id);
 	//controller = std::make_unique<KeyInput>();
 	OverFlag = false;
 
@@ -547,9 +608,9 @@ void State::Init(void)
 	controller[conType::Key]->SetUp(_id);
 	controller[conType::Pad]->SetUp(_id);
 
-	
-	
-	
+	score_ = 0;
+	rennsaCnt_ = 0;
+
 	_dataBase.resize((__int64)gridMax.x * gridMax.y);
 
 	for (size_t no = 0; no < gridMax.y; no++)
@@ -690,6 +751,7 @@ void State::Init(void)
 			}
 			else
 			{
+
 				puyomode_ = PuyoMode::連鎖;
 			}
 	
@@ -834,11 +896,18 @@ void State::Init(void)
 		
 		if (Flag)
 		{
+			//rennsaCnt_ = 0;
 			puyomode_ = PuyoMode::お邪魔ぷよ落下;
 
 		}
 		else
 		{
+			rennsaCnt_++;
+			if ((rennsaCnt_ > 1))
+			{
+				_timeCount.Set("連鎖", true, 3);
+
+			}
 			puyomode_ = PuyoMode::連鎖;
 
 		}
@@ -934,6 +1003,11 @@ void State::Init(void)
 		if (!Flag)
 		{
 			InstancePuyo();
+			if (rennsaCnt_ > 0 && !_timeCount.GetFlag("連鎖"))
+			{
+				rennsaCnt_ = 0;
+			}
+
 			puyomode_ = PuyoMode::落下;
 
 		}

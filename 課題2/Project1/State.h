@@ -6,6 +6,8 @@
 #include "common/Input/Controller.h"
 #include "Ojyama.h"
 #include "NextPuyo.h"
+#include "common/Number.h"
+#include "common/TimeCount.h"
 
 enum class PuyoMode
 {
@@ -51,10 +53,11 @@ private:
 	bool downCheck(sharePuyo& puyo);
 	bool SetEraser(PuyoID id, Vector2 pos);
 	void delPuyo(void);
-	
+	void ObjDraw(void);
 	Permit_Data _pData;
 	Permit_Data _drawData;
 
+	const char* name_;
 
 	std::map<conType,std::unique_ptr<Controller>> controller;
 	
@@ -80,9 +83,14 @@ private:
 	static int _stateCount;
 	int _id;
 	int _color;
+	int _color2;
 	int tagetID;
 	
 	int overImage_[2];
+	int score_;
+	int rennsaCnt_;
+
+	Number number_;
 protected:
 
 	std::map<PuyoMode,std::function<void(void)>> puyoMode_;

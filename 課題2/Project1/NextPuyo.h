@@ -13,7 +13,7 @@ public:
 	NextPuyo(Vector2 &nextPos,int haveCount ,int drawCount);
 	~NextPuyo();
 	const NextList& Get(void);
-	void Draw(Vector2 offest);
+	void Draw(Vector2 offest, int color);
 	pairPuyo pickUp(void);
 	bool Add(int no);
 

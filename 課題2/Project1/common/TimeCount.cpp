@@ -18,7 +18,7 @@ void TimeCount::Run(void)
 		}
 	};
 	
-	type("—‚¿‚é");
+	type("˜A½");
 
 }
 
@@ -35,6 +35,11 @@ const bool TimeCount::GetFlag(const char* string)
 	return _flag[string];
 }
 
+const double TimeCount::GetCnt(const char* string)
+{
+	return _cnt[string];
+}
+
 TimeCount::TimeCount()
 {
 	auto add = [&](std::string string) {
@@ -43,7 +48,7 @@ TimeCount::TimeCount()
 
 	};
 	
-	add("—‚¿‚é");
+	add("˜A½");
 }
 
 TimeCount::~TimeCount()

@@ -68,7 +68,6 @@ void GameScene::Draw(void)
 {
 	ClsDrawScreen();
 
-	DrawGraph(0, 0, IMAGE_ID("BG")[0], true);
 
 	for (auto&& state : playerState)
 	{
@@ -79,18 +78,26 @@ void GameScene::Draw(void)
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
+	DrawGraph(0, 0, IMAGE_ID("BG")[0], true);
 
 	
 	DrawGraph(0, 0, playerState[0]->GetScreenId(), true);
+
+
 	for (auto&& state : playerState)
 	{
 		if (state->OverFlag)
 		{
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
 			DrawGraph(350, 500, IMAGE_ID("space")[0], true);
-		}	
+
+			SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+		}
+
 	}
 	
 	IpEffect.Draw();
+
 	if (IpSceneMng._blendCnt)
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, IpSceneMng._blendCnt);
@@ -99,5 +106,9 @@ void GameScene::Draw(void)
 	}
 	ScreenFlip();
 
+}
+
+void GameScene::ObjDraw(void)
+{
 }
 

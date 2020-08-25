@@ -20,16 +20,25 @@ const NextList& NextPuyo::Get(void)
 	return nextPuyoList_;
 }
 
-void NextPuyo::Draw(Vector2 offest)
+void NextPuyo::Draw(Vector2 offest,int color)
 {
 	int count = drawCount_;
 	//auto beforID = GetDrawScreen();
 	//SetDrawScreen(screenID);
 	//ClsDrawScreen();
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
+	DrawBox(nextPos_.x+8*48, nextPos_.y+48, nextPos_.x +9*48, nextPos_.y+3*48, color, true);
+
+	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+
+
+	DrawBoxAA(nextPos_.x+8*48, nextPos_.y+48, nextPos_.x +9*48, nextPos_.y+3*48, 0xFFFFFF, false,3.0f);
+
 	for (auto puyo : nextPuyoList_)
 	{
-		puyo.first->Draw(offest);
-		puyo.second->Draw(offest);
+
+		puyo.first->Draw(nextPos_);
+		puyo.second->Draw(nextPos_);
 
 		count--;
 		if (count <= 0)
@@ -67,8 +76,9 @@ bool NextPuyo::Add(int no)
 
 	}
 
-	Vector2 pos1 = { 48*8,0 };
-	Vector2 pos2 = { 48*8,48 };
+	Vector2 pos1 = { 48*8,48 };
+	Vector2 pos2 = { 48*8,96 };
+
 	Vector2 offset = { 48,24 };
 	for (auto puyoPair : nextPuyoList_)
 	{

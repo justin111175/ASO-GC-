@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="common\Number.cpp" />
     <ClCompile Include="Scene\BaseScene.cpp" />
     <ClCompile Include="common\ImageMng.cpp" />
     <ClCompile Include="common\TimeCount.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="common\Number.h" />
     <ClInclude Include="Scene\BaseScene.h" />
     <ClInclude Include="common\detail\Vector2.h" />
     <ClInclude Include="common\ImageMng.h" />

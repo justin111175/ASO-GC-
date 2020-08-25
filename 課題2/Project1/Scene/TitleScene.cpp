@@ -69,6 +69,10 @@ void TitleScene::Init(void)
 	controller.emplace(conType::Key, std::make_unique<KeyInput>());
 	controller[conType::Key]->SetUp(0);
 	
+	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
+	controller[conType::Pad]->SetUp(0);
+
+
 	//controller[conType::Pad]->SetUp(_id);
 
 	IpImageMng.GetID("マーク", "image/mark.png", { 45,45 }, { 1,1 });
@@ -82,6 +86,8 @@ void TitleScene::Init(void)
 
 void TitleScene::MeanCtl(void)
 {
+	(*controller[conType::Key])();
+
 	for (auto data : controller[conType::Key]->GetCntData())
 	{
 		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
@@ -126,8 +132,51 @@ void TitleScene::MeanCtl(void)
 		}
 
 	}
-	(*controller[conType::Key])();
+	(*controller[conType::Pad])();
 
+	for (auto data : controller[conType::Pad]->GetCntData(0))
+	{
+		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+		{
+			switch (data.first)
+			{
+			case InputID::Up:
+
+				if (meanID_ <= TitleMean::一人プレイ)
+				{
+					meanID_ = TitleMean::ゲームオーバー;
+				}
+				else
+				{
+					meanID_ = (TitleMean)(static_cast<int>(meanID_) - 1);
+
+				}
+				break;
+			case InputID::Down:
+				if (meanID_ >= TitleMean::ゲームオーバー)
+				{
+					meanID_ = TitleMean::一人プレイ;
+				}
+				else
+				{
+					meanID_ = (TitleMean)(static_cast<int>(meanID_) + 1);
+
+				}
+				break;
+			case InputID::Btn1:
+				switch (meanID_)
+				{
+				case TitleMean::ゲームオーバー:
+					DxLib_End();
+					break;
+				default:
+					Flag = true;
+					break;
+				}
+				break;
+			}
+		}
+	}
 
 }
 
@@ -138,21 +187,22 @@ void TitleScene::Draw(void)
 	DrawGraph(0,0, IMAGE_ID("BG")[0], true);
 	DrawGraph(0,0, IMAGE_ID("Frame")[0], true);
 	
-	DrawRotaGraph3(400,0,0,0,1.0f,0.8f,0, IMAGE_ID("Main")[0], true);
+	DrawRotaGraph3(300,100,0,0,1.0f,0.8f,0, IMAGE_ID("Main")[0], true);
 
 
 	ChangeFontType(DX_FONTTYPE_EDGE);
 
-	SetFontSize(60);
-	DrawString(400, 200, "ぷよぷよ課題", 0xFFFFFF);
+	SetFontSize(50);
+	DrawString(500, 135, "ぷよぷよ課題", 0xFFFFFF);
 	
 	SetFontSize(30);
 
-	DrawString(450, 400, "一人プレイ", 0xFFFFFF);
-	DrawString(450, 450, "二人プレイ", 0xFFFFFF);
-	DrawString(450, 500, "ゲーム終了", 0xFFFFFF);
+	DrawString(450, 250, "一人プレイ", 0xFFFFFF);
+	DrawString(450, 300, "二人プレイ", 0xFFFFFF);
+	DrawString(450, 350, "ゲーム終了", 0xFFFFFF);
 
-	DrawGraph(400+sin((double)IpSceneMng.frames()/5)*5, 393+ static_cast<int>(meanID_)*50, IMAGE_ID("マーク")[0], true);
+	DrawGraph(400+sin((double)IpSceneMng.frames()/5)*5, 243+ static_cast<int>(meanID_)*50, IMAGE_ID("マーク")[0], true);
+
 	if (IpSceneMng._blendCnt)
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA,IpSceneMng._blendCnt);

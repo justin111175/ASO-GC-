@@ -76,6 +76,7 @@ unique_Base GameScene2::Update(unique_Base own)
 void GameScene2::Draw(void)
 {
 	ClsDrawScreen();
+	DrawGraph(0, 0, IMAGE_ID("BG")[0], true);
 
 	for (auto&& state : playerState)
 	{
@@ -99,7 +100,10 @@ void GameScene2::Draw(void)
 	{
 		if (state->OverFlag)
 		{
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
 			DrawGraph(350, 500, IMAGE_ID("space")[0], true);
+
+			SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 		}
 	}
 	IpEffect.Draw();
