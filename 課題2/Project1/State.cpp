@@ -8,6 +8,7 @@
 #include <functional>
 #include <type_traits>
 #include "EffectMng.h"
+#include "common/ImageMng.h"
 
 int State::_stateCount = 0;
 State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
@@ -17,6 +18,7 @@ State::State(Vector2&& _offset, Vector2&& _size):blockSize_(48),gridMax(8,14)
 	_stateCount++;
 	
 	tagetID = 0;
+	dropSpeed_ = 1;
 
 	winFlag_ = PlayState::Win;
 
@@ -77,7 +79,7 @@ void State::Draw(void)
 		
 	ObjDraw();
 
-	if (OverFlag)
+	if (overFlag_)
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
 		DrawBox(_offset.x, _offset.y, _offset.x + (gridMax.x) * blockSize_, _offset.y + (gridMax.y) * blockSize_, 0x000000, true);
@@ -86,6 +88,10 @@ void State::Draw(void)
 		DrawGraph(_offset.x+60 , _offset.y+200, overImage_[static_cast<int>(winFlag_)], true);
 
 	}
+	//if (meanFlag_)
+	//{
+	//	MeanDraw();
+	//}
 	number_.Draw({ _offset.x+ blockSize_*7+10,_offset.y+ blockSize_*13+5 }, { 0.3f,0.4f }, score_);
 
 }
@@ -101,6 +107,8 @@ void State::ObjDraw(void)
 	DrawBox(_offset.x + blockSize_, _offset.y + blockSize_, _offset.x + (gridMax.x - 1) * blockSize_, _offset.y + (gridMax.y - 1) * blockSize_, _color, true);
 
 	DrawBoxAA(_offset.x + blockSize_, _offset.y + blockSize_, _offset.x + (gridMax.x - 1) * blockSize_, _offset.y + (gridMax.y - 1) * blockSize_, 0xFFFFFF, false, 3.0f);
+
+	SetFontSize(30);
 
 	DrawString(_offset.x+10, _offset.y+5, name_, 0xFFFFFF);
 
@@ -147,14 +155,40 @@ void State::ObjDraw(void)
 	{
 		ojyama->Draw(_offset);
 	}
-	//if (rennsaFlag_)
-	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, _timeCount.GetCnt("連鎖"));
-		DrawFormatString(_offset.x + blockSize_ * 3, _offset.y + blockSize_ * 6, 0xFFFFFF, "%d連鎖", rennsaCnt_);
 
-		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+	SetFontSize(50);
 
-	}
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _timeCount.GetCnt("連鎖"));
+	DrawFormatString(_offset.x + blockSize_ * 3, _offset.y + blockSize_ * 6, 0xFFFFFF, "%d連鎖", rennsaCnt_);
+	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+	
+
+
+	
+
+
+}
+
+void State::MeanDraw(void)
+{
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
+	//DrawRotaGraph3(_offset.x-40, _offset .y+100, 0, 0, 0.6f, 0.5f, 0, IMAGE_ID("Main")[0], true);
+	DrawBox(_offset.x + blockSize_ * 1, _offset.y + blockSize_ * 4, _offset.x + blockSize_ * 7, _offset.y + blockSize_ * 8, 0x000000, true);
+	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+	DrawBoxAA(_offset.x + blockSize_ * 1-24, _offset.y+blockSize_ * 4, _offset.x + blockSize_ * 7+24, _offset.y + blockSize_ * 8, 0xFFFFFF, false,3.0f);
+
+	SetFontSize(30);
+	DrawString(_offset.x + blockSize_ * 1 - 24, _offset.y + blockSize_ * 4, "メニュー", 0xFFFFFF);
+
+	SetFontSize(20);
+	
+	DrawBox(_offset.x + blockSize_ * 1, _offset.y + blockSize_ * 5-5+ static_cast<int>(playMean_)* blockSize_, _offset.x + blockSize_ * 4+20, _offset.y + blockSize_ * 5+30 + static_cast<int>(playMean_) * blockSize_, 0x000000, true);
+	DrawBoxAA(_offset.x + blockSize_ * 1, _offset.y + blockSize_ * 5-5 + static_cast<int>(playMean_) * blockSize_, _offset.x + blockSize_ * 4+20, _offset.y + blockSize_ * 5+30 + static_cast<int>(playMean_) * blockSize_, 0xFFFFFF, false,3.0f);
+
+	DrawString(_offset.x + blockSize_ * 1, _offset.y + blockSize_ * 5, "タイトルに戻る", 0xFFFFFF);
+	DrawString(_offset.x + blockSize_ * 1, _offset.y + blockSize_ * 6, "ゲームに戻る", 0xFFFFFF);
+	DrawString(_offset.x + blockSize_ * 1, _offset.y + blockSize_ * 7, "ゲーム終了", 0xFFFFFF);
+
 
 
 }
@@ -162,20 +196,28 @@ void State::ObjDraw(void)
 void State::Run(void)
 {
 
-	puyoMode_[puyomode_]();
-
-	if (rennsaCnt_ >1&&!_timeCount.GetFlag("連鎖"))
+	if (overFlag_)
 	{
-		rennsaCnt_ = 0;
+		OverCtl();
 	}
+	else
+	{
+		//if (!meanFlag_)
+		{
+			puyoMode_[puyomode_]();
+			if (rennsaCnt_ >1&&!_timeCount.GetFlag("連鎖"))
+			{
+				rennsaCnt_ = 0;
+			}
+		}
+		//else
+		//{
+		//	MeanCtl();
+
+		//}
 
 
-	//if (!_timeCount.GetFlag("連鎖"))
-	//{
-	//	rennsaCnt_ = 0;
-	//}
-
-
+	}
 
 	TRACE("%d\n", rennsaCnt_);
 
@@ -304,8 +346,6 @@ void State::playerCtl(void)
 		case InputID::テスト用:
 			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
 			{
-				
-
 				InstanceOjyamapuyo();
 
 			}
@@ -373,12 +413,26 @@ void State::playerCtl(void)
 			}
 
 			break;
-		case InputID::テスト用:
+		case InputID::Btn3:
 			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
 			{
-				InstanceOjyamapuyo();
+				puyomode_ = PuyoMode::連鎖;
+				dropSpeed_ = 16;
+
 			}
 			break;
+		case InputID::Mean:
+			if (!meanFlag_)
+			{
+				if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+				{
+					playMean_ = PlayMean::タイトルに戻る;
+					meanFlag_ = true;
+				}
+			}
+
+			break;
+			
 		default:
 			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
 			{
@@ -407,13 +461,102 @@ void State::playerCtl(void)
 				else
 				{
 					Rotemove(_puyo[tagetID], _puyo[tagetID ^ 1], data.first);
+
 				}
+			
 			}
 
 			break;
 		}
 	}
 
+}
+
+void State::OverCtl(void)
+{
+
+
+	(*controller[conType::Pad])();
+
+	for (auto data : controller[conType::Pad]->GetCntData(_id))
+	{
+		switch (data.first)
+		{
+		case InputID::Btn1:
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+				sceneFlag_ = true;
+			}
+			break;
+		}
+	}
+
+
+}
+
+void State::MeanCtl(void)
+{
+	(*controller[conType::Pad])();
+
+	for (auto data : controller[conType::Pad]->GetCntData(_id))
+	{
+
+
+		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+		{
+			switch (data.first)
+			{
+			case InputID::Up:
+				if (playMean_ <= PlayMean::タイトルに戻る)
+				{
+					playMean_ = PlayMean::ゲーム終了;
+				}
+				else
+				{
+					playMean_ = (PlayMean)(static_cast<int>(playMean_) - 1);
+
+				}
+				break;
+			case InputID::Down:
+				if (playMean_ >= PlayMean::ゲーム終了)
+				{
+					playMean_ = PlayMean::タイトルに戻る;
+				}
+				else
+				{
+					playMean_ = (PlayMean)(static_cast<int>(playMean_) + 1);
+
+				}
+				break;
+			case InputID::Btn2:
+				meanFlag_ = false;
+				break;
+			case InputID::Btn1:
+				switch (playMean_)
+				{
+				case PlayMean::タイトルに戻る:
+					sceneFlag_ = true;
+					break;
+				case PlayMean::ゲームに戻る:
+
+					meanFlag_ = false;
+
+					break;
+				case PlayMean::ゲーム終了:
+					DxLib_End();
+					break;
+				default:
+					break;
+				}
+
+
+				break;
+			}
+		}
+		
+
+
+	}
 }
 
 bool State::downCheck(sharePuyo& puyo)
@@ -447,14 +590,7 @@ bool State::downCheck(sharePuyo& puyo)
 
 bool State::InstancePuyo(void)
 {
-	
 
-	//int id = (rand() % (static_cast<int>(PuyoID::Max) -3) + 1);
-
-	//pos_ = { gridMax.x / 2 * blockSize_,blockSize_*1 };
-
-	//id = (rand() % (static_cast<int>(PuyoID::Max) -3) + 1);
-	//_puyo.emplace(_puyo.begin(), std::make_shared<Puyo>(std::move(pos_), static_cast<PuyoID>(id)));
 
 
 	auto pickupPuyo = nextPuyo_->pickUp();
@@ -545,7 +681,7 @@ bool State::SetEraser(PuyoID id,Vector2 pos)
 				IpEffect.Play("puyo1", puyo->Pos(), _offset);
 				_data[pos.y][pos.x] = PuyoID::NON;
 				puyo->Alive(false);
-				score_ = score_ + count * 100;
+				score_ = score_ + (count * 10)+(rennsaCnt_)*100;
 
 			}
 
@@ -598,7 +734,7 @@ void State::Init(void)
 	_color = 0x000033<<(16*_id);
 	_color2 = 0x0000AA<<(16*_id);
 	//controller = std::make_unique<KeyInput>();
-	OverFlag = false;
+	overFlag_ = false;
 
 	controller.try_emplace(conType::Key, std::make_unique<KeyInput>());
 	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
@@ -610,9 +746,10 @@ void State::Init(void)
 
 	score_ = 0;
 	rennsaCnt_ = 0;
-
+	sceneFlag_ = false;
+	meanFlag_ = false;
 	_dataBase.resize((__int64)gridMax.x * gridMax.y);
-
+	playMean_ = PlayMean::タイトルに戻る;
 	for (size_t no = 0; no < gridMax.y; no++)
 	{
 		_data.emplace_back(&_dataBase[no * gridMax.x]);
@@ -646,9 +783,8 @@ void State::Init(void)
 		
 		playerCtl();
 
-
-		_puyo[tagetID]->Run(1);
-		_puyo[tagetID^1]->Run(1);
+		_puyo[tagetID]->Run(dropSpeed_);
+		_puyo[tagetID^1]->Run(dropSpeed_);
 
 		//bool drop = false;
 		//std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
@@ -673,7 +809,7 @@ void State::Init(void)
 					puyo->Cnt(0);
 				}
 			});
-
+			dropSpeed_ = 8;
 			puyomode_ = PuyoMode::ぷよ;
 		}
 
@@ -712,7 +848,7 @@ void State::Init(void)
 
 			std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 
-				if (!puyo->Run(8))
+				if (!puyo->Run(dropSpeed_))
 				{
 					rennsaFlag = false;
 				}
@@ -726,7 +862,7 @@ void State::Init(void)
 
 			std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
 
-				if (!ojyama->Run(8))
+				if (!ojyama->Run(dropSpeed_))
 				{
 					rennsaFlag = false;
 				}
@@ -905,7 +1041,7 @@ void State::Init(void)
 			rennsaCnt_++;
 			if ((rennsaCnt_ > 1))
 			{
-				_timeCount.Set("連鎖", true, 3);
+				_timeCount.Set("連鎖", true, 5);
 
 			}
 			puyomode_ = PuyoMode::連鎖;
@@ -1007,6 +1143,7 @@ void State::Init(void)
 			{
 				rennsaCnt_ = 0;
 			}
+			dropSpeed_ = 1;
 
 			puyomode_ = PuyoMode::落下;
 
@@ -1014,7 +1151,7 @@ void State::Init(void)
 		else
 		{
 			winFlag_ = PlayState::Lose;
-			OverFlag = true;
+			overFlag_ = true;
 		}
 
 

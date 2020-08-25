@@ -27,6 +27,12 @@ enum class PlayState
 	MAX
 };
 
+enum class PlayMean
+{	
+	タイトルに戻る,
+	ゲームに戻る,
+	ゲーム終了
+};
 
 using sharedOjyama = std::shared_ptr<Ojyama>;
 
@@ -40,7 +46,9 @@ public:
 	void Draw(void);
 	void Run(void);
 	
-	bool OverFlag;
+	bool overFlag_;
+	bool sceneFlag_;
+	bool meanFlag_;
 	PlayState winFlag_;
 
 
@@ -48,12 +56,16 @@ public:
 private:
 	
 	PuyoMode puyomode_;
-	
+	PlayMean playMean_;
 	void playerCtl(void);
+	void OverCtl(void);
+	void MeanCtl(void);
 	bool downCheck(sharePuyo& puyo);
 	bool SetEraser(PuyoID id, Vector2 pos);
 	void delPuyo(void);
+
 	void ObjDraw(void);
+	void MeanDraw(void);
 	Permit_Data _pData;
 	Permit_Data _drawData;
 
@@ -89,7 +101,7 @@ private:
 	int overImage_[2];
 	int score_;
 	int rennsaCnt_;
-
+	int dropSpeed_;
 	Number number_;
 protected:
 

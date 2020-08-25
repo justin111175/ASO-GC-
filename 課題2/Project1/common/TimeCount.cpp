@@ -9,7 +9,7 @@ void TimeCount::Run(void)
 		{
 			if (_cnt[string] > 0)
 			{
-				_cnt[string]--;
+				_cnt[string]-=3;
 			}
 			else
 			{

@@ -36,29 +36,27 @@ unique_Base GameScene2::Update(unique_Base own)
 	{
 		for (auto&& state : playerState)
 		{
-			if (!state->OverFlag)
-			{
-				state->Run();
 
-			}
-			else
-			{
-				if (CheckHitKey(KEY_INPUT_SPACE))
-				{
-					return std::make_unique<TitleScene>();
+			state->Run();
 
-				}
+
+			if (state->sceneFlag_)
+			{
+				return std::make_unique<TitleScene>();
+
 			}
 
 
 		}
-		if (playerState[0]->OverFlag)
+
+	
+		if (playerState[0]->overFlag_)
 		{
-			playerState[1]->OverFlag = true;
+			playerState[1]->overFlag_ = true;
 		}
-		if (playerState[1]->OverFlag)
+		if (playerState[1]->overFlag_)
 		{
-			playerState[0]->OverFlag = true;
+			playerState[0]->overFlag_ = true;
 		}
 	}
 
@@ -98,7 +96,7 @@ void GameScene2::Draw(void)
 
 	for (auto&& state : playerState)
 	{
-		if (state->OverFlag)
+		if (state->overFlag_)
 		{
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
 			DrawGraph(350, 500, IMAGE_ID("space")[0], true);
