@@ -23,11 +23,11 @@ public:
 	virtual ~BaseScene();
 	virtual unique_Base Update(unique_Base own) = 0;					// 純粋仮想関数
 
+	virtual void BaseDraw(void) = 0;					
+
 protected:
 	void FadeInit(std::string fadeType);								// Fade初期化
 	bool FadeUpdate(void);												// Fade更新
-	void GameMeanDraw(void);
-	void MeanCtl(void);
 
 	std::string _fadeType;												// Fadeタイプ
 	GameMean gameMean_;

@@ -12,6 +12,7 @@ Puyo::Puyo(Vector2&& pos, PuyoID id)
 	pos_ = pos;
 	_size = { 48,48 };
 	id_ = id;
+	puyoFlag_ = false;
 	Init();
 }
 
@@ -123,6 +124,7 @@ void Puyo::Move(InputID id)
 
 bool Puyo::SetPData(DirBit dirbit)
 {
+	_pDataOld= _pData;
 	_pData._bit = dirbit;
 	return true;
 }
@@ -189,23 +191,51 @@ bool Puyo::puyo(void)
 
 	if (puyoMode_ == PuyonState::puyo)
 	{
-		if (_cnt < 30)
-		{
-			_cnt += 2; 
-			puyoPos_ = sin(_cnt / 10.0);
-			return false;
+		//if (_cnt <= 30)
+		//{
+		//	_cnt += 2; 
+		//	puyoPos_ = sin(_cnt / 10.0);
+		//	return false;
 
+		//}
+		//else
+		//{
+		//	puyoMode_ = PuyonState::stay;
+		//	return true;
+		//}
+
+
+		if (puyoFlag_)
+		{
+			if (_cnt <= 30)
+			{
+				_cnt += 2; 
+				puyoPos_ = sin(_cnt / 10.0);
+				return false;
+
+			}
+			else
+			{
+				puyoMode_ = PuyonState::stay;
+				puyoFlag_ = false;
+				_cnt = 0;
+				return false;
+
+			}
 		}
 		else
 		{
-			puyoMode_ == PuyonState::stay;
 			return true;
 		}
 
 	}
+	else
+	{
+		return true;
+
+	}
 
 
-	return false;
 
 }
 
@@ -216,10 +246,7 @@ const Vector2 Puyo::GetGrid(int size)
 	return Vector2{ pos_.x / size,(pos_.y) / size };
 }
 
-void Puyo::SetPuyoCnt(void)
-{
-	//puyoCnt_=
-}
+
 
 void Puyo::Init(void)
 {

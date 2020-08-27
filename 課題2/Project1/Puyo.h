@@ -68,10 +68,14 @@ public:
 	bool puyo(void);
 
 	Permit_Data _pData;
+	Permit_Data _pDataOld;
 	Permit_Data _drawData;
 
 	virtual const Vector2 GetGrid(int size);
 	void SetPuyoCnt(void);
+
+	int puyoNum_;
+	bool puyoFlag_;
 private:
 	double _cnt;
 	bool _alive;

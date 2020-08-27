@@ -13,6 +13,7 @@ public:
 	GameScene2();
 	~GameScene2();
 	unique_Base Update(unique_Base own) override;					// 更新
+	void BaseDraw(void) override;					// 更新
 
 
 private:

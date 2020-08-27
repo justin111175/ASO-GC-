@@ -28,25 +28,103 @@ unique_Base TitleScene::Update(unique_Base own)
 
 	if (!FadeUpdate())
 	{
-		MeanCtl();
+		(*controller[conType::Key])();
 
-		if (Flag)
+		for (auto data : controller[conType::Key]->GetCntData())
 		{
-			switch (meanID_)
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
 			{
-			case TitleMean::一人プレイ:
-				return std::make_unique<GameScene>();
+				switch (data.first)
+				{
+				case InputID::Up:
 
-				break;
-			case TitleMean::二人プレイ:
-				return std::make_unique<GameScene2>();
+					if (meanID_ <= TitleMean::一人プレイ)
+					{
+						meanID_ = TitleMean::ゲームオーバー;
+					}
+					else
+					{
+						meanID_ = (TitleMean)(static_cast<int>(meanID_) - 1);
 
-				break;
-			default:
-				break;
+					}
+					break;
+				case InputID::Down:
+					if (meanID_ >= TitleMean::ゲームオーバー)
+					{
+						meanID_ = TitleMean::一人プレイ;
+					}
+					else
+					{
+						meanID_ = (TitleMean)(static_cast<int>(meanID_) + 1);
+
+					}
+					break;
+				case InputID::Btn1:
+					switch (meanID_)
+					{
+					case TitleMean::一人プレイ:
+						return std::make_unique<GameScene>();
+						break;
+					case TitleMean::二人プレイ:
+						return std::make_unique<GameScene2>();
+						break;
+					case TitleMean::ゲームオーバー:
+						DxLib_End();
+						break;
+
+					}
+				}
 			}
-
 		}
+		(*controller[conType::Pad])();
+
+		for (auto data : controller[conType::Pad]->GetCntData(0))
+		{
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+				switch (data.first)
+				{
+				case InputID::Up:
+
+					if (meanID_ <= TitleMean::一人プレイ)
+					{
+						meanID_ = TitleMean::ゲームオーバー;
+					}
+					else
+					{
+						meanID_ = (TitleMean)(static_cast<int>(meanID_) - 1);
+
+					}
+					break;
+				case InputID::Down:
+					if (meanID_ >= TitleMean::ゲームオーバー)
+					{
+						meanID_ = TitleMean::一人プレイ;
+					}
+					else
+					{
+						meanID_ = (TitleMean)(static_cast<int>(meanID_) + 1);
+
+					}
+					break;
+				case InputID::Btn1:
+					switch (meanID_)
+					{
+					case TitleMean::一人プレイ:
+						return std::make_unique<GameScene>();
+						break;
+					case TitleMean::二人プレイ:
+						return std::make_unique<GameScene2>();
+						break;
+					case TitleMean::ゲームオーバー:
+						DxLib_End();
+						break;
+
+					}
+				}
+			}
+		}
+
 	}
 			
 	
@@ -56,6 +134,13 @@ unique_Base TitleScene::Update(unique_Base own)
 
 
 	return std::move(own);
+}
+
+
+
+void TitleScene::BaseDraw(void)
+{
+	
 }
 
 

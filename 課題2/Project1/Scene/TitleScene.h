@@ -16,7 +16,8 @@ public:
 	TitleScene();
 	~TitleScene();
 	unique_Base Update(unique_Base own) override;					// 更新
-	
+	void BaseDraw(void) override;					// 更新
+
 
 
 private:
@@ -26,7 +27,6 @@ private:
 	void MeanCtl(void);
 	void Draw(void);
 	bool Flag;
-	std::map<conType, std::unique_ptr<Controller>> controller;
 	int cnt_;
 };
 

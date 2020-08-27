@@ -8,7 +8,8 @@
 #include "EffectMng.h"
 #include "../common/ImageMng.h"
 #include "../common/Input/PadInput.h"
-
+#include "MeanScene.h"
+#include "GameOverScene.h"
 GameScene2::GameScene2()
 {
 
@@ -26,8 +27,7 @@ GameScene2::GameScene2()
 	IpImageMng.GetID("勝負画像", "image/win.png", { 260,150 }, { 1,2 });
 
 	gameMean_ = GameMean::タイトルに戻る;
-	meanFlag_ = false;
-	sceneFlag_ = false;
+
 
 }
 
@@ -42,7 +42,6 @@ unique_Base GameScene2::Update(unique_Base own)
 
 
 	Draw();
-	MeanCtl();
 
 	// 無返事参照、const参照、shared_ptr三つの方法がある
 	if (!FadeUpdate())
@@ -65,21 +64,24 @@ unique_Base GameScene2::Update(unique_Base own)
 				}
 				if (state->overFlag_)
 				{
-					overFlag_ = true;
+					return std::make_unique<GameOverScene>(std::move(own));
 				}
-				if (overFlag_)
-				{
-					state->overFlag_ = true;
-				}
+
 			}
 		}
 	}
+	(*controller[conType::Pad])();
 
-	if (sceneFlag_)
+	for (auto data : controller[conType::Pad]->GetCntData(0))
 	{
-		return std::make_unique<TitleScene>();
+		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+		{
 
-
+			if (data.first == InputID::Mean)
+			{
+				return std::make_unique<MeanScene>(std::move(own));
+			}
+		}
 	}
 
 
@@ -91,9 +93,10 @@ unique_Base GameScene2::Update(unique_Base own)
 	return std::move(own);
 }
 
-void GameScene2::Draw(void)
+
+
+void GameScene2::BaseDraw(void)
 {
-	ClsDrawScreen();
 	DrawGraph(0, 0, IMAGE_ID("BG")[0], true);
 
 	for (auto&& state : playerState)
@@ -105,14 +108,14 @@ void GameScene2::Draw(void)
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
-	//for (auto&& state : playerState)
-	//{
-	//	DrawGraph(0, 0,state->GetScreenId(), true);
-	//}
+	for (auto&& state : playerState)
+	{
+		DrawGraph(0, 0,state->GetScreenId(), true);
+	}
 
-	DrawGraph(0, 0, playerState[0]->GetScreenId(), true);
+	//DrawGraph(0, 0, playerState[0]->GetScreenId(), true);
 
-	DrawGraph(0, 0, playerState[1]->GetScreenId(), true);
+	//DrawGraph(0, 0, playerState[1]->GetScreenId(), true);
 
 	for (auto&& state : playerState)
 	{
@@ -134,29 +137,28 @@ void GameScene2::Draw(void)
 		DrawBox(0, 0, IpSceneMng.ScreenSize.x, IpSceneMng.ScreenSize.y, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 
-		//DrawString(515, 300, "GAME OVER", 0xFFFFFF, 0x000000);
-
 		for (auto&& state : playerState)
 		{
-			DrawGraph(state->_offset.x+60 , state->_offset.y+200, IMAGE_ID("勝負画像")[static_cast<int>(state->winFlag_)], true);
+			DrawGraph(state->_offset.x + 60, state->_offset.y + 200, IMAGE_ID("勝負画像")[static_cast<int>(state->winFlag_)], true);
 
 		}
-
-
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
 		DrawGraph(350, 500, IMAGE_ID("space")[0], true);
 
 		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 	}
-	if (meanFlag_)
-	{
-		GameMeanDraw();
-	}
+
+
+}
+
+void GameScene2::Draw(void)
+{
+	ClsDrawScreen();
+
+
+	BaseDraw();
 	IpEffect.Draw();
-
-
-
 
 	if (IpSceneMng._blendCnt)
 	{

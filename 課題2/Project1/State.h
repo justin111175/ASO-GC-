@@ -45,20 +45,21 @@ public:
 	bool overFlag_;
 	bool sceneFlag_;
 	bool rennsaFlag_;
-	PlayState winFlag_;
+	bool winFlag_;
 	
 	Vector2 _offset;
 
 
-	
+	const int GetID(void);
 private:
 	
 	PuyoMode puyomode_;
 	void playerCtl(void);
 	void OverCtl(void);
-	void MeanCtl(void);
 	bool downCheck(sharePuyo& puyo);
 	bool SetEraser(PuyoID id, Vector2 pos);
+	
+	bool PuyoCheck(Vector2 pos);
 	void delPuyo(void);
 
 	void ObjDraw(void);
@@ -77,6 +78,9 @@ private:
 
 	std::vector<PuyoID> _EraserdataBase;
 	std::vector<PuyoID*> _Eraserdata;
+	
+	std::vector<PuyoID> _PuyodataBase;
+	std::vector<PuyoID*> _Puyodata;
 
 	bool InstancePuyo(void);
 	bool InstanceOjyamapuyo(void);

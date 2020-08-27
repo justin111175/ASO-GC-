@@ -147,6 +147,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="common\Number.cpp" />
+    <ClCompile Include="Scene\GameOverScene.cpp" />
+    <ClCompile Include="Scene\GameScene2.cpp" />
     <ClCompile Include="Scene\MeanScene.cpp" />
     <ClCompile Include="Scene\BaseScene.cpp" />
     <ClCompile Include="common\ImageMng.cpp" />
@@ -156,18 +158,19 @@
     <ClCompile Include="EffectMng.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="common\Input\KeyInput.cpp" />
-    <ClCompile Include="Scene\GameScene2.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="common\Input\PadInput.cpp" />
     <ClCompile Include="NextPuyo.cpp" />
     <ClCompile Include="Ojyama.cpp" />
     <ClCompile Include="Puyo.cpp" />
     <ClCompile Include="Scene\SceneMng.cpp" />
-    <ClCompile Include="State.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
+    <ClCompile Include="State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\Number.h" />
+    <ClInclude Include="Scene\GameOverScene.h" />
+    <ClInclude Include="Scene\GameScene2.h" />
     <ClInclude Include="Scene\MeanScene.h" />
     <ClInclude Include="Scene\BaseScene.h" />
     <ClInclude Include="common\detail\Vector2.h" />
@@ -183,13 +186,12 @@
     <ClInclude Include="common\Input\KeyInput.h" />
     <ClInclude Include="common\Input\InputID.h" />
     <ClInclude Include="common\Input\PadInput.h" />
-    <ClInclude Include="Scene\GameScene2.h" />
     <ClInclude Include="NextPuyo.h" />
     <ClInclude Include="Ojyama.h" />
     <ClInclude Include="Puyo.h" />
     <ClInclude Include="Scene\SceneMng.h" />
-    <ClInclude Include="State.h" />
     <ClInclude Include="Scene\TitleScene.h" />
+    <ClInclude Include="State.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
