@@ -1,11 +1,20 @@
 #pragma once
 #include <memory>
 #include <String>
+#include "../common/Input/Controller.h"
 // クラスのプロトタイプ宣言
 class BaseScene;
 
 
 using unique_Base = std::unique_ptr<BaseScene>;							// スマートポインタ-BaseScene
+
+
+enum class GameMean
+{
+	タイトルに戻る,
+	ゲームに戻る,
+	ゲーム終了
+};
 
 class BaseScene
 {
@@ -17,9 +26,19 @@ public:
 protected:
 	void FadeInit(std::string fadeType);								// Fade初期化
 	bool FadeUpdate(void);												// Fade更新
-	std::string _fadeType;												// Fadeタイプ
+	void GameMeanDraw(void);
+	void MeanCtl(void);
 
+	std::string _fadeType;												// Fadeタイプ
+	GameMean gameMean_;
+	
+	bool meanFlag_;
+	bool sceneFlag_;
+	
+	std::map<conType, std::unique_ptr<Controller>> controller;
+	bool overFlag_;
 private:
+
 	int _fadeScrID;														// Fade描画ID
 };
 

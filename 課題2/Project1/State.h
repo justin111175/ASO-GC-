@@ -12,6 +12,7 @@
 enum class PuyoMode
 {
 	落下,
+	直接落下,
 	ぷよ,
 	むにょん,
 	連鎖,
@@ -27,12 +28,7 @@ enum class PlayState
 	MAX
 };
 
-enum class PlayMean
-{	
-	タイトルに戻る,
-	ゲームに戻る,
-	ゲーム終了
-};
+
 
 using sharedOjyama = std::shared_ptr<Ojyama>;
 
@@ -48,15 +44,16 @@ public:
 	
 	bool overFlag_;
 	bool sceneFlag_;
-	bool meanFlag_;
+	bool rennsaFlag_;
 	PlayState winFlag_;
+	
+	Vector2 _offset;
 
 
-
+	
 private:
 	
 	PuyoMode puyomode_;
-	PlayMean playMean_;
 	void playerCtl(void);
 	void OverCtl(void);
 	void MeanCtl(void);
@@ -65,15 +62,12 @@ private:
 	void delPuyo(void);
 
 	void ObjDraw(void);
-	void MeanDraw(void);
 	Permit_Data _pData;
 	Permit_Data _drawData;
 
 	const char* name_;
 
 	std::map<conType,std::unique_ptr<Controller>> controller;
-	
-	
 
 	const int blockSize_;
 	const Vector2 gridMax;
@@ -90,7 +84,6 @@ private:
 	int screenID;
 	void Init(void);
 
-	Vector2 _offset;
 	Vector2 _size;
 	static int _stateCount;
 	int _id;
@@ -98,7 +91,6 @@ private:
 	int _color2;
 	int tagetID;
 	
-	int overImage_[2];
 	int score_;
 	int rennsaCnt_;
 	int dropSpeed_;

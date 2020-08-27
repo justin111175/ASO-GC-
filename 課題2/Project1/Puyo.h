@@ -57,6 +57,8 @@ public:
 	const Vector2& Pos(void);
 	bool Pos(Vector2 pos);
 
+	const bool& PuyoMode(void);
+
 	const PuyoID& ID(void);
 
 	const bool& Alive(void);

@@ -146,6 +146,18 @@ bool Puyo::Pos(Vector2 pos)
 	return true;
 }
 
+const bool& Puyo::PuyoMode(void)
+{
+	if (puyoMode_ == PuyonState::stay)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 const PuyoID& Puyo::ID(void)
 {
 	return id_;
@@ -213,7 +225,9 @@ void Puyo::Init(void)
 {
 	_drawData._bit = { 1,1,1,1 };
 	puyoCnt_ = 0;
+
 	puyoMode_ = PuyonState::stay;
+
 	_alive = true;
 	_dropCnt = 0;
 	_dropInt = 20;

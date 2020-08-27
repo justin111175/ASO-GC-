@@ -7,6 +7,7 @@
 #include <utility>
 #include "EffectMng.h"
 #include "../common/ImageMng.h"
+#include "../common/Input/PadInput.h"
 
 GameScene2::GameScene2()
 {
@@ -15,9 +16,18 @@ GameScene2::GameScene2()
 	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(100, 50)), std::move(Vector2(700 + 100, 722))));
 
 	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(800, 50)), std::move(Vector2(700 + 800, 722))));
+	
+	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
+
+	controller[conType::Pad]->SetUp(0);
 
 	cnt_ = 100;
 	IpImageMng.GetID("space", "image/space.png", { 570,40 }, { 1,1 });
+	IpImageMng.GetID("勝負画像", "image/win.png", { 260,150 }, { 1,2 });
+
+	gameMean_ = GameMean::タイトルに戻る;
+	meanFlag_ = false;
+	sceneFlag_ = false;
 
 }
 
@@ -29,38 +39,48 @@ GameScene2::~GameScene2()
 
 unique_Base GameScene2::Update(unique_Base own)
 {
+
+
 	Draw();
+	MeanCtl();
 
 	// 無返事参照、const参照、shared_ptr三つの方法がある
 	if (!FadeUpdate())
 	{
-		for (auto&& state : playerState)
+		if (!meanFlag_)
 		{
-
-			state->Run();
-
-
-			if (state->sceneFlag_)
+			for (auto&& state : playerState)
 			{
-				return std::make_unique<TitleScene>();
 
+				if (!_timeCount.GetFlag("待つ"))
+				{
+					state->Run();
+
+				}
+
+				if (state->sceneFlag_)
+				{
+					return std::make_unique<TitleScene>();
+
+				}
+				if (state->overFlag_)
+				{
+					overFlag_ = true;
+				}
+				if (overFlag_)
+				{
+					state->overFlag_ = true;
+				}
 			}
-
-
-		}
-
-	
-		if (playerState[0]->overFlag_)
-		{
-			playerState[1]->overFlag_ = true;
-		}
-		if (playerState[1]->overFlag_)
-		{
-			playerState[0]->overFlag_ = true;
 		}
 	}
 
+	if (sceneFlag_)
+	{
+		return std::make_unique<TitleScene>();
 
+
+	}
 
 
 	IpEffect.Updata();
@@ -104,7 +124,38 @@ void GameScene2::Draw(void)
 			SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 		}
 	}
+
+	if (overFlag_)
+	{
+
+		SetFontSize(50);
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
+		DrawBox(0, 0, IpSceneMng.ScreenSize.x, IpSceneMng.ScreenSize.y, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+
+		//DrawString(515, 300, "GAME OVER", 0xFFFFFF, 0x000000);
+
+		for (auto&& state : playerState)
+		{
+			DrawGraph(state->_offset.x+60 , state->_offset.y+200, IMAGE_ID("勝負画像")[static_cast<int>(state->winFlag_)], true);
+
+		}
+
+
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
+		DrawGraph(350, 500, IMAGE_ID("space")[0], true);
+
+		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+	}
+	if (meanFlag_)
+	{
+		GameMeanDraw();
+	}
 	IpEffect.Draw();
+
+
 
 
 	if (IpSceneMng._blendCnt)

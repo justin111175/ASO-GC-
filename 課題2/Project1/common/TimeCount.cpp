@@ -19,6 +19,9 @@ void TimeCount::Run(void)
 	};
 	
 	type("連鎖");
+	type("連鎖落下");
+	type("待つ");
+
 
 }
 
@@ -49,6 +52,9 @@ TimeCount::TimeCount()
 	};
 	
 	add("連鎖");
+	add("連鎖落下");
+	add("待つ");
+
 }
 
 TimeCount::~TimeCount()

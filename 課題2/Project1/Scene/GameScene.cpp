@@ -8,21 +8,25 @@
 #include "EffectMng.h"
 #include "../common/ImageMng.h"
 #include "../common/Input/PadInput.h"
+#include "MeanScene.h"
 
 GameScene::GameScene()
-{	
+{
 
 
-	playerState.emplace_back(std::make_unique<State>(std::move (Vector2(450, 50)), std::move(Vector2(700+450, 722))));
-	
+	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(450, 50)), std::move(Vector2(700 + 450, 722))));
+
 	IpImageMng.GetID("space", "image/space.png", { 570,40 }, { 1,1 });
-	
+
 	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
 
 	controller[conType::Pad]->SetUp(0);
 
 	cnt_ = 0;
-
+	gameMean_ = GameMean::タイトルに戻る;
+	meanFlag_ = false;
+	sceneFlag_ = false;
+	overFlag_ = false;
 }
 
 
@@ -33,36 +37,50 @@ GameScene::~GameScene()
 
 unique_Base GameScene::Update(unique_Base own)
 {
-	Draw();
 
 	// 無返事参照、const参照、shared_ptr三つの方法がある
+
+	Draw();
+	MeanCtl();
+
 	if (!FadeUpdate())
 	{
-		for (auto&& state : playerState)
+		if (!meanFlag_)
 		{
-			if (!state->meanFlag_)
+			for (auto&& state : playerState)
 			{
-				state->Run();
+				if (!_timeCount.GetFlag("待つ"))
+				{
+					state->Run();
+
+				}
+
+				if (state->overFlag_)
+				{
+					overFlag_ = true;
+				}
+				if (state->sceneFlag_)
+				{
+					return std::make_unique<TitleScene>();
+
+				}
 
 			}
-
-			
-			if (state->sceneFlag_)
-			{
-				return std::make_unique<TitleScene>();
-
-			}
-
-
 		}
+	}
+
+	if (CheckHitKey(KEY_INPUT_F1))
+	{
+		return std::make_unique<MeanScene>(std::move(own));
 
 	}
 
-
-
+	if (sceneFlag_)
+	{
+		return std::make_unique<TitleScene>();
+	}
 
 	IpEffect.Updata();
-
 
 
 
@@ -89,22 +107,32 @@ void GameScene::Draw(void)
 	DrawGraph(0, 0, playerState[0]->GetScreenId(), true);
 
 
-	for (auto&& state : playerState)
+
+	if (overFlag_)
 	{
-		if (state->overFlag_)
-		{
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
-			DrawGraph(350, 500, IMAGE_ID("space")[0], true);
 
-			SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
-		}
-		if (state->meanFlag_)
-		{
-			MeanDraw();
-		}
+		SetFontSize(50);
 
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
+		DrawBox(0,0,IpSceneMng.ScreenSize.x,IpSceneMng.ScreenSize.y, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+
+		DrawString(515, 300, "GAME OVER", 0xFFFFFF, 0x000000);
+		//DrawGraph(_offset.x+60 , _offset.y+200, overImage_[static_cast<int>(winFlag_)], true);
+
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
+		DrawGraph(350, 500, IMAGE_ID("space")[0], true);
+
+		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 	}
+
 	
+	
+	if (meanFlag_)
+	{
+		GameMeanDraw();
+	}
 	IpEffect.Draw();
 
 	if (IpSceneMng._blendCnt)
@@ -117,28 +145,4 @@ void GameScene::Draw(void)
 
 }
 
-void GameScene::MeanDraw(void)
-{
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
-	DrawBox(400,200,900,500, 0x000000, true);
-	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
-	DrawBoxAA(400, 200, 900, 500, 0xFFFFFF, false, 3.0f);
-
-	SetFontSize(50);
-	DrawString(400,200, "メニュー", 0xFFFFFF);
-	DrawBoxAA(400, 200, 900, 250, 0xFFFFFF, false, 3.0f);
-
-	SetFontSize(30);
-
-	DrawBox(420, 270, 660, 320, 0x000000, true);
-	DrawBoxAA(420, 270, 660, 320, 0xFFFFFF, false, 3.0f);
-
-	DrawString(420, 270, "タイトルに戻る", 0xFFFFFF);
-	DrawString(420, 320, "ゲームに戻る", 0xFFFFFF);
-	DrawString(420, 370, "ゲーム終了", 0xFFFFFF);
-}
-
-void GameScene::ObjDraw(void)
-{
-}
 
