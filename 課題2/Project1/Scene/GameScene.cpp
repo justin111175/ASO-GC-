@@ -14,9 +14,10 @@ GameScene::GameScene()
 {
 
 
-	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(450, 50)), std::move(Vector2(700 + 450, 722))));
+	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(450, 50)), std::move(Vector2(700 + 450, 800))));
 
 	IpImageMng.GetID("space", "image/space.png", { 570,40 }, { 1,1 });
+	IpImageMng.GetID("X", "image/X.png", { 57,57 }, { 1,1 });
 
 	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
 
@@ -57,7 +58,7 @@ unique_Base GameScene::Update(unique_Base own)
 
 			if (state->overFlag_)
 			{
-				return std::make_unique<GameOverScene>(std::move(own));
+				return std::make_unique<GameOverScene>(std::move(own), playerState.size());
 			}
 
 

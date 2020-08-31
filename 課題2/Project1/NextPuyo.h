@@ -10,7 +10,7 @@ using NextList = std::list<pairPuyo>;
 class NextPuyo
 {
 public:
-	NextPuyo(Vector2 &nextPos,int haveCount ,int drawCount);
+	NextPuyo(Vector2 &nextPos,int haveCount ,int drawCoun,int ID);
 	~NextPuyo();
 	const NextList& Get(void);
 	void Draw(Vector2 offest, int color);
@@ -22,5 +22,8 @@ private:
 	NextList nextPuyoList_;
 	int drawCount_;
 	int screenID;
+	static int _stateCount;
+
+	int id_;
 };
 

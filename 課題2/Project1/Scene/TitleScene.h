@@ -19,7 +19,6 @@ public:
 	void BaseDraw(void) override;					// XV
 
 
-
 private:
 	void Init(void);
 	TitleMean meanID_;

@@ -64,7 +64,7 @@ unique_Base GameScene2::Update(unique_Base own)
 				}
 				if (state->overFlag_)
 				{
-					return std::make_unique<GameOverScene>(std::move(own));
+					return std::make_unique<GameOverScene>(std::move(own), playerState.size());
 				}
 
 			}

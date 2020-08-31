@@ -13,7 +13,6 @@ public:
 	~MeanScene();
 	unique_Base Update(unique_Base own) override;					// 更新
 	void BaseDraw(void) override;					// 更新
-
 private:
 	unique_Base childScene_;
 

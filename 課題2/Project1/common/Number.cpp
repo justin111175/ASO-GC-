@@ -5,7 +5,7 @@
 // ‰Šú‰»
 void Number::Init(void)
 {
-	IpImageMng.GetID("”š1", "image/Number/Number1.png", { 90,100 }, { 10,1 });
+	IpImageMng.GetID("”š1", "image/Number/Number3.png", { 45,50 }, { 10,1 });
 	numLen = 1;
 }
 
@@ -25,7 +25,7 @@ void Number::Draw(Vector2 pos,Vector2Dbl exrate, int score)
 	for (int i = 0; i < numLen; i++)
 	{
 		//IpSceneMng.AddDrawQue({ IMAGE_ID("”š1")[score % 10], {pos.x - 90 * exrate.x * i,pos.y} ,{0,0},{exrate.x,exrate.y},0,false,0,LAYER::NUMBER });
-		DrawRotaGraph3(pos.x - 90 * exrate.x * i, pos.y, 0, 0, exrate.x, exrate.y, 0, IMAGE_ID("”š1")[score % 10], true, false);
+		DrawRotaGraph3(pos.x - 45 * exrate.x * i, pos.y, 0, 0, exrate.x, exrate.y, 0, IMAGE_ID("”š1")[score % 10], true, false);
 		score /= 10;
 	}
 

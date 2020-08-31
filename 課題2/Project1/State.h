@@ -96,6 +96,7 @@ private:
 	int tagetID;
 	
 	int score_;
+	int scoreOld_;
 	int rennsaCnt_;
 	int dropSpeed_;
 	Number number_;

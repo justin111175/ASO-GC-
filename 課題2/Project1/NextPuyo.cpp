@@ -1,9 +1,14 @@
 #include "NextPuyo.h"
 #include <Dxlib.h>
+#include "Scene/SceneMng.h"
 
-NextPuyo::NextPuyo(Vector2& nextPos, int haveCount, int drawCount)
+
+
+NextPuyo::NextPuyo(Vector2& nextPos, int haveCount, int drawCount,int ID)
 {
 	//screenID = MakeScreen(96, 48*4, true);
+	id_ = ID;
+
 	nextPuyoList_.clear();
 	drawCount_ = drawCount;
 	nextPos_ = nextPos;
@@ -28,11 +33,13 @@ void NextPuyo::Draw(Vector2 offest,int color)
 	//ClsDrawScreen();
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
 	DrawBox(nextPos_.x+8*48, nextPos_.y+48, nextPos_.x +9*48, nextPos_.y+3*48, color, true);
+	DrawBox(nextPos_.x+9*48, nextPos_.y+48+24, nextPos_.x +10*48, nextPos_.y+3*48+24, color, true);
 
 	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 
 
 	DrawBoxAA(nextPos_.x+8*48, nextPos_.y+48, nextPos_.x +9*48, nextPos_.y+3*48, 0xFFFFFF, false,3.0f);
+	DrawBoxAA(nextPos_.x + 9 * 48, nextPos_.y + 48 + 24, nextPos_.x + 10 * 48, nextPos_.y + 3 * 48 + 24, 0xFFFFFF, false,3.0f);
 
 	for (auto puyo : nextPuyoList_)
 	{
@@ -78,8 +85,25 @@ bool NextPuyo::Add(int no)
 
 	Vector2 pos1 = { 48*8,48 };
 	Vector2 pos2 = { 48*8,96 };
+	Vector2 offset;
+	
+	if (id_==0)
+	{
+		offset = { 48,24 };
+	}		
+	else
+	{
+		offset = { -48,24 };
 
-	Vector2 offset = { 48,24 };
+	}
+
+
+
+	
+
+	
+
+
 	for (auto puyoPair : nextPuyoList_)
 	{
 		puyoPair.first->Pos(std::move(pos1));

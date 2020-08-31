@@ -9,7 +9,7 @@
 
 
 
-GameOverScene::GameOverScene(unique_Base own)
+GameOverScene::GameOverScene(unique_Base own, int no)
 {
 	childScene_ = std::move(own);
 
@@ -17,6 +17,7 @@ GameOverScene::GameOverScene(unique_Base own)
 
 	controller[conType::Pad]->SetUp(0);
 	cnt_ = 0;
+	playerSize_ = no;
 }
 
 
@@ -61,7 +62,6 @@ void GameOverScene::BaseDraw(void)
 
 
 
-
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, cnt_);
 	DrawBox(0, 0, IpSceneMng.ScreenSize.x, IpSceneMng.ScreenSize.y, 0x000000, true);
 
@@ -76,12 +76,17 @@ void GameOverScene::BaseDraw(void)
 		//}
 		//else
 		//{			
+		if (playerSize_ == 1)
+		{
 			SetFontSize(50);
 			DrawString(515, 300, "GAME OVER", 0xFFFFFF, 0x000000);
 
+		}
+		else
+		{
+			DrawString(300, 300, "TEST  2", 0xFFFFFF, 0x000000);
 
-
-		//}
+		}
 
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
@@ -94,3 +99,5 @@ void GameOverScene::BaseDraw(void)
 	ScreenFlip();
 
 }
+
+
