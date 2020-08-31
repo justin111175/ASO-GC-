@@ -10,24 +10,20 @@
 #include "../common/Input/PadInput.h"
 #include "MeanScene.h"
 #include "GameOverScene.h"
+
+// 二人プレイモード
 GameScene2::GameScene2()
 {
+	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(100, 50)), std::move(Vector2(700 + 100, 800))));
 
-
-	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(100, 50)), std::move(Vector2(700 + 100, 722))));
-
-	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(800, 50)), std::move(Vector2(700 + 800, 722))));
+	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(800, 50)), std::move(Vector2(700 + 800, 800))));
 	
 	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
 
 	controller[conType::Pad]->SetUp(0);
 
-	cnt_ = 100;
 	IpImageMng.GetID("space", "image/space.png", { 570,40 }, { 1,1 });
 	IpImageMng.GetID("勝負画像", "image/win.png", { 260,150 }, { 1,2 });
-
-	gameMean_ = GameMean::タイトルに戻る;
-
 
 }
 

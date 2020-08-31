@@ -2,19 +2,12 @@
 #include <memory>
 #include <String>
 #include "../common/Input/Controller.h"
+
 // クラスのプロトタイプ宣言
 class BaseScene;
-
-
 using unique_Base = std::unique_ptr<BaseScene>;							// スマートポインタ-BaseScene
 
 
-enum class GameMean
-{
-	タイトルに戻る,
-	ゲームに戻る,
-	ゲーム終了
-};
 
 class BaseScene
 {
@@ -30,7 +23,6 @@ protected:
 	bool FadeUpdate(void);												// Fade更新
 
 	std::string _fadeType;												// Fadeタイプ
-	GameMean gameMean_;
 	
 	bool meanFlag_;
 	bool sceneFlag_;

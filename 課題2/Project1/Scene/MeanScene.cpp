@@ -9,7 +9,6 @@ MeanScene::MeanScene(unique_Base own)
 {
     childScene_ = std::move(own);
 	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
-
 	controller[conType::Pad]->SetUp(0);
 
 }
@@ -20,11 +19,6 @@ MeanScene::~MeanScene()
 
 unique_Base MeanScene::Update(unique_Base own)
 {
-	if (CheckHitKey(KEY_INPUT_F2))
-	{
-		return childScene_->Update(std::move(childScene_));
-	}
-
 	(*controller[conType::Pad])();
 
 	for (auto data : controller[conType::Pad]->GetCntData(0))
@@ -73,15 +67,11 @@ unique_Base MeanScene::Update(unique_Base own)
 					DxLib_End();
 					break;
 				}
-				break;
-				
-			}
-			
+				break;			
+			}		
 		}
 	}
-
 	BaseDraw();
-
 	return std::move(own);
 }
 

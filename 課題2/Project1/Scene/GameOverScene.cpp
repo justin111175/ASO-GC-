@@ -6,9 +6,6 @@
 #include "../common/ImageMng.h"
 
 
-
-
-
 GameOverScene::GameOverScene(unique_Base own, int no)
 {
 	childScene_ = std::move(own);
@@ -19,8 +16,6 @@ GameOverScene::GameOverScene(unique_Base own, int no)
 	cnt_ = 0;
 	playerSize_ = no;
 }
-
-
 
 GameOverScene::~GameOverScene()
 {
@@ -50,7 +45,6 @@ unique_Base GameOverScene::Update(unique_Base own)
 		}
 	}
 
-
 	BaseDraw();
 	return std::move(own);
 }
@@ -60,22 +54,12 @@ void GameOverScene::BaseDraw(void)
 	ClsDrawScreen();
 	childScene_->BaseDraw();
 
-
-
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, cnt_);
 	DrawBox(0, 0, IpSceneMng.ScreenSize.x, IpSceneMng.ScreenSize.y, 0x000000, true);
 
 	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 	if (cnt_ >= 125)
-	{
-		//if (state_->winFlag_)
-		//{
-		//	SetFontSize(50);
-		//	DrawString(515, 300, "GAME CLEAR", 0xFFFFFF, 0x000000);
-
-		//}
-		//else
-		//{			
+	{	
 		if (playerSize_ == 1)
 		{
 			SetFontSize(50);
@@ -84,11 +68,10 @@ void GameOverScene::BaseDraw(void)
 		}
 		else
 		{
-			DrawString(300, 300, "TEST  2", 0xFFFFFF, 0x000000);
+			DrawString(300, 300, "TEST  Player1", 0xFFFFFF, 0x000000);
+			DrawString(900, 300, "TEST  Player2", 0xFFFFFF, 0x000000);
 
 		}
-
-
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
 		DrawGraph(350, 500, IMAGE_ID("space")[0], true);
 

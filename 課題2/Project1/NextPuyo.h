@@ -12,17 +12,15 @@ class NextPuyo
 public:
 	NextPuyo(Vector2 &nextPos,int haveCount ,int drawCoun,int ID);
 	~NextPuyo();
-	const NextList& Get(void);
-	void Draw(Vector2 offest, int color);
-	pairPuyo pickUp(void);
-	bool Add(int no);
+	const NextList& Get(void);						// ゲットnextぷよリスト
+	void Draw(int color);
+	pairPuyo pickUp(void);							// 古いnextぷよ消す、新しいnextぷよ追加
+	bool Add(int no);								// nextぷよ追加
 
 private:
-	Vector2 nextPos_;
-	NextList nextPuyoList_;
-	int drawCount_;
-	int screenID;
-	static int _stateCount;
+	Vector2 nextPos_;								// nextぷよ座標
+	NextList nextPuyoList_;							// nextぷよリスト
+	int drawCount_;									
 
 	int id_;
 };

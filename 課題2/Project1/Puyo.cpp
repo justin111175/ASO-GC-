@@ -8,11 +8,8 @@
 
 Puyo::Puyo(Vector2&& pos, PuyoID id)
 {
-
 	pos_ = pos;
-	_size = { 48,48 };
 	id_ = id;
-	puyoFlag_ = false;
 	Init();
 }
 
@@ -20,52 +17,53 @@ Puyo::~Puyo()
 {
 }
 
+// ぷよ描画表示
 void Puyo::Draw(Vector2 offset)
 {
-	//DrawCircle(pos_.x+_size.x / 2+offset.x, pos_.y+ _size.y / 2, _size.x/2, color_, true);
+	// ぷよ本体
 	DrawOval(pos_.x+_size.x / 2+offset.x,
-		pos_.y+ _size.y/2  +24* puyoPos_+ offset.y,
+		pos_.y+ _size.y/2  +24* puyoPos_ + offset.y,
 		_size.x/2,
-		(_size.y/2), color_, true);
+		(_size.y/2) , color_, true);
 	
-	//左
-	if (!_drawData._bit.LEFT)
+	// むよんー＞左
+	if (_drawData._bit.LEFT)
 	{
 		DrawBox(pos_.x + offset.x, 
-			pos_.y + 24 * sin(_cnt / 10.0) + offset.y,
+			pos_.y + 24 * puyoPos_ + offset.y,
 			pos_.x + _size.x / 2 + offset.x, 
-			pos_.y + _size.y + 24 * sin(_cnt / 10.0) + offset.y, color_, true);
+			pos_.y + _size.y + 24 * puyoPos_ + offset.y, color_, true);
 	}
-	//右
-	if (!_drawData._bit.RIGHT)
+	// むよんー＞右
+	if (_drawData._bit.RIGHT)
 	{
 		DrawBox(pos_.x + _size.x/2 + offset.x, 
-			pos_.y + 24 * sin(_cnt / 10.0) + offset.y,
+			pos_.y + 24 * puyoPos_ + offset.y,
 			pos_.x + _size.x  + offset.x, 
-			pos_.y + _size.y + 24 * sin(_cnt / 10.0) + offset.y, color_, true);
+			pos_.y + _size.y + 24 * puyoPos_ + offset.y, color_, true);
 	}
 
-	//上
-	if (!_drawData._bit.UP )
+	// むよんー＞上
+	if (_drawData._bit.UP )
 	{
 		DrawBox(pos_.x + offset.x, 
-			pos_.y + 24 * sin(_cnt / 10.0) + offset.y,
+			pos_.y + 24 * puyoPos_ + offset.y,
 			pos_.x + _size.x + offset.x, 
-			pos_.y + _size.y / 2 + 24 * sin(_cnt / 10.0) + offset.y, color_, true);
+			pos_.y + _size.y / 2 + 24 * puyoPos_ + offset.y, color_, true);
 	}
-	//下
-	if (!_drawData._bit.DOWN)
+	// むよんー＞下
+	if (_drawData._bit.DOWN)
 	{
 		DrawBox(pos_.x + offset.x,
-			pos_.y + _size.y / 2 + 24 * sin(_cnt / 10.0) + offset.y,
+			pos_.y + _size.y / 2 + 24 * puyoPos_ + offset.y,
 			pos_.x + _size.x + offset.x,
-			pos_.y + _size.y + 24 * sin(_cnt / 10.0) + offset.y, color_, true);
+			pos_.y + _size.y + 24 * puyoPos_ + offset.y, color_, true);
 	}
 }
 
+// 更新（落ちる速度）
 bool Puyo::Run(int no)
 {
-
 	if (_dropCnt < _dropInt)
 	{
 		_dropCnt++;
@@ -76,14 +74,11 @@ bool Puyo::Run(int no)
 		pos_.y+=no;
 		return true;
 	}
-	
-
-
 }
 
+// ぷよ移動操作
 void Puyo::Move(InputID id)
 {
-
 		switch (id)
 		{
 		case InputID::Up:
@@ -114,14 +109,10 @@ void Puyo::Move(InputID id)
 				pos_.x += _size.x;
 			}
 			break;
-
-		default:
-			break;
 		}
-	
-
 }
 
+// 移動制限
 bool Puyo::SetPData(DirBit dirbit)
 {
 	_pDataOld= _pData;
@@ -129,55 +120,45 @@ bool Puyo::SetPData(DirBit dirbit)
 	return true;
 }
 
+// むにょん描画制御
 bool Puyo::SetDrawData(DirBit& dirbit)
 {
 	_drawData._bit = dirbit;
 	return true;
 }
 
-
-
+// ゲットPos
 const Vector2& Puyo::Pos(void)
 {
 	return pos_;
 }
 
+// Posセット
 bool Puyo::Pos(Vector2 pos)
 {
 	pos_ = pos;
 	return true;
 }
 
-const bool& Puyo::PuyoMode(void)
-{
-	if (puyoMode_ == PuyonState::stay)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
+// ゲットぷよID
 const PuyoID& Puyo::ID(void)
 {
 	return id_;
 }
 
-
-
-
+// ゲット生きるかどうか
 const bool& Puyo::Alive(void)
 {
 	return _alive;
 }
 
+// 生きるかどうかセット
 bool Puyo::Alive(bool flag)
 {
 	return _alive=flag;
 }
 
+// ぷよん用カンドセット
 bool Puyo::Cnt(double cnt)
 {
 	_cnt = cnt;
@@ -185,26 +166,12 @@ bool Puyo::Cnt(double cnt)
 
 	return true;
 }
-
+// ぷよんする
 bool Puyo::puyo(void)
 {
-
 	if (puyoMode_ == PuyonState::puyo)
 	{
-		//if (_cnt <= 30)
-		//{
-		//	_cnt += 2; 
-		//	puyoPos_ = sin(_cnt / 10.0);
-		//	return false;
-
-		//}
-		//else
-		//{
-		//	puyoMode_ = PuyonState::stay;
-		//	return true;
-		//}
-
-
+		//ぷよモードがぷよんの場合、ぷよん開始
 		if (puyoFlag_)
 		{
 			if (_cnt <= 30)
@@ -212,15 +179,14 @@ bool Puyo::puyo(void)
 				_cnt += 2; 
 				puyoPos_ = sin(_cnt / 10.0);
 				return false;
-
 			}
 			else
 			{
 				puyoMode_ = PuyonState::stay;
 				puyoFlag_ = false;
 				_cnt = 0;
+				puyoPos_ = sin(_cnt / 10.0);
 				return false;
-
 			}
 		}
 		else
@@ -234,24 +200,23 @@ bool Puyo::puyo(void)
 		return true;
 
 	}
-
-
-
 }
 
+// ぷよのマス目をとる
 const Vector2 Puyo::GetGrid(int size)
 {
-
-	
 	return Vector2{ pos_.x / size,(pos_.y) / size };
 }
 
-
+int Puyo::SetPuyoCnt(int cnt)
+{
+	return puyoCnt_ = cnt;
+}
 
 void Puyo::Init(void)
 {
-	_drawData._bit = { 1,1,1,1 };
-	puyoCnt_ = 0;
+	_drawData._bit = { 0,0,0,0 };
+	puyoCnt_ = 1;
 
 	puyoMode_ = PuyonState::stay;
 
@@ -260,6 +225,9 @@ void Puyo::Init(void)
 	_dropInt = 20;
 	puyoPos_ = 0;
 	_cnt = 0;
+	_size = { 48,48 };
+	puyoFlag_ = false;
+
 	switch (id_)
 	{
 	case PuyoID::赤:
@@ -277,12 +245,7 @@ void Puyo::Init(void)
 	case PuyoID::紫:
 		color_ = 0xFF00FF;
 		break;
-	default:
-		break;
 	}
-
-
-
 }
 
 

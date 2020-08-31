@@ -38,40 +38,47 @@ public:
 
 	State(Vector2&& _offset, Vector2&& _size);
 	~State();
-	int GetScreenId(void);
-	void Draw(void);
-	void Run(void);
+	int GetScreenId(void);											// stateの画面ID
+	void Draw(void);												// ゲーム描画
+	void Run(void);													// 更新
 	
 	bool overFlag_;
 	bool sceneFlag_;
 	bool rennsaFlag_;
 	bool winFlag_;
 	
-	Vector2 _offset;
-
+	Vector2 _offset;												// 座標
 
 	const int GetID(void);
 private:
-	
-	PuyoMode puyomode_;
-	void playerCtl(void);
-	void OverCtl(void);
-	bool downCheck(sharePuyo& puyo);
-	bool SetEraser(PuyoID id, Vector2 pos);
-	
-	bool PuyoCheck(Vector2 pos);
-	void delPuyo(void);
+		
+	PuyoMode puyomode_;												// ぷよのモード		
+	void playerCtl(void);											// プレイヤー操作
+	bool downCheck(sharePuyo& puyo);								// ぷよの下のマスチェック
 
-	void ObjDraw(void);
+	bool SetEraser(PuyoID id, Vector2 pos);							// 消すぷよチェック
+	
+	bool PuyoCheck(Vector2 pos);									// ぷよんするかどうかチェック
+
+	void delPuyo(void);												// ぷよ消す
+	bool InstancePuyo(void);										// インスタンスぷよ
+
+	bool InstanceOjyamapuyo(void);									// インスタンスお邪魔ぷよ
+
+	void ObjDraw(void);												// 一人のゲームシーン
+
 	Permit_Data _pData;
 	Permit_Data _drawData;
 
-	const char* name_;
+	const char* name_;												// プレイヤーID
+
 
 	std::map<conType,std::unique_ptr<Controller>> controller;
 
+
 	const int blockSize_;
 	const Vector2 gridMax;
+
 
 	std::vector<PuyoID> _dataBase;
 	std::vector<PuyoID*> _data;
@@ -82,8 +89,6 @@ private:
 	std::vector<PuyoID> _PuyodataBase;
 	std::vector<PuyoID*> _Puyodata;
 
-	bool InstancePuyo(void);
-	bool InstanceOjyamapuyo(void);
 
 	int screenID;
 	void Init(void);
@@ -103,8 +108,6 @@ private:
 protected:
 
 	std::map<PuyoMode,std::function<void(void)>> puyoMode_;
-	
-	
 	std::vector<sharePuyo> _puyo;
 	std::unique_ptr<NextPuyo> nextPuyo_;
 	std::vector<sharedOjyama> _ojyama;
