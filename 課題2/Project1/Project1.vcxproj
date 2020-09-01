@@ -146,6 +146,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Scene\CtlScene.cpp" />
+    <ClCompile Include="Scene\CheckScene.cpp" />
     <ClCompile Include="common\Number.cpp" />
     <ClCompile Include="Scene\GameOverScene.cpp" />
     <ClCompile Include="Scene\GameScene2.cpp" />
@@ -168,6 +170,8 @@
     <ClCompile Include="State.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scene\CtlScene.h" />
+    <ClInclude Include="Scene\CheckScene.h" />
     <ClInclude Include="common\Number.h" />
     <ClInclude Include="Scene\GameOverScene.h" />
     <ClInclude Include="Scene\GameScene2.h" />

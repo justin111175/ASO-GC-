@@ -1,7 +1,7 @@
 #pragma once
 #include "Controller.h"
 #include <array>
-
+#include <vector>
 class KeyInput :
     public Controller
 {
@@ -10,8 +10,7 @@ class KeyInput :
 	bool SetUp(int no) override;
 	void Updata(void) override;
 private:
-	std::array<char, 256> _keyData;
-	std::map<InputID, int> _inputTbl;
-
+	std::array<char, 256> _keyData[2];
+	std::map<InputID,int> _inputTbl;
 };
 

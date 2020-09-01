@@ -21,13 +21,13 @@ public:
 protected:
 	void FadeInit(std::string fadeType);								// Fade初期化
 	bool FadeUpdate(void);												// Fade更新
-
+	bool MeanCtl(conType input);
 	std::string _fadeType;												// Fadeタイプ
 	
 	bool meanFlag_;
 	bool sceneFlag_;
 	
-	std::map<conType, std::unique_ptr<Controller>> controller;
+	std::map<conType, std::unique_ptr<Controller>> controller[2];
 	bool overFlag_;
 private:
 

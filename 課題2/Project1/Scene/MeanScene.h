@@ -19,7 +19,10 @@ public:
 	unique_Base Update(unique_Base own) override;					// 更新
 	void BaseDraw(void) override;									// 描画
 private:
+	bool MeanCtl(conType input);
 	GameMean gameMean_;
 	unique_Base childScene_;										// 子シーン
+	int cnt_;
+	int key_;
 };
 

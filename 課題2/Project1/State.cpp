@@ -86,8 +86,12 @@ void State::Draw(void)
 // ゲーム画面
 void State::ObjDraw(void)
 {
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
 	DrawBox(_offset.x, _offset.y, _offset.x + (gridMax.x) * blockSize_, _offset.y + (gridMax.y) * blockSize_, _color2, true);
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
+
+	DrawBox(_offset.x, _offset.y, _offset.x + (gridMax.x) * blockSize_, _offset.y + (gridMax.y) * blockSize_, 0x000000, true);
+
 	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 
 	DrawBoxAA(_offset.x, _offset.y, _offset.x + (gridMax.x) * blockSize_, _offset.y + (gridMax.y) * blockSize_, 0xFFFFFF, false, 3.0f);
@@ -185,10 +189,10 @@ void State::Run(void)
 			// 1フレーム前のスコアとスコア同じじゃない場合、1フレーム前のスコアを１たす
 			if (score_ != scoreOld_)
 			{
-				{
-					scoreOld_++;
+				
+				scoreOld_++;
 
-				}
+				
 			}
 		}
 	}
@@ -199,7 +203,7 @@ const int State::GetID(void)
 	return _id;
 }
 
-void State::playerCtl(void)
+void State::playerCtl(conType input)
 {
 	_pData._bit = { 1,1,1,1 };
 	// ぷよの方向変換関数
@@ -296,79 +300,15 @@ void State::playerCtl(void)
 
 	};
 	
-	// キーボードでする場合
-	(*controller[conType::Key])();
-	for (auto data : controller[conType::Key]->GetCntData())
-	{
-		switch (data.first)
-		{
-		case InputID::Down:
-			if (data.second[static_cast<int>(Trg::Now)])
-			{
-				for (int i = 0; i < 2; i++)
-				{
-					auto pos = _puyo[i]->GetGrid(blockSize_);
-
-					if (_data[(_int64)pos.y + 1][pos.x] != PuyoID::NON)
-					{
-						_pData._bit.DOWN = 0;
-						break;
-					}
-					_puyo[i]->SetPData(_pData._bit);
-					_puyo[i]->Move(data.first);
-				}
-			}
-			break;
-		case InputID::テスト用:
-			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-			{
-				InstanceOjyamapuyo();
-			}
-			break;
-		default:
-			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-			{
-				if ((data.first != InputID::Btn1) && (data.first != InputID::Btn2))
-				{
-					auto RLcheck = [&](int tagetID) {
-						auto pos = _puyo[tagetID]->GetGrid(blockSize_);
-						if (_data[pos.y][pos.x + 1] != PuyoID::NON)
-						{
-							_pData._bit.RIGHT = 0;
-						}
-						if (_data[pos.y][pos.x - 1] != PuyoID::NON)
-						{
-							_pData._bit.LEFT = 0;
-						}
-					};
-					RLcheck(tagetID);
-					RLcheck(tagetID ^ 1);
-					for (int i = 0; i < 2; i++)
-					{
-						_puyo[i]->SetPData(_pData._bit);
-						_puyo[i]->Move(data.first);
-					}
-				}
-				else
-				{
-
-					Rotemove(_puyo[tagetID], _puyo[tagetID ^ 1], data.first);
-				}
-			}
-			break;
-		}
-
-	}
 
 	// コントロールでする場合
 
-	(*controller[conType::Pad])();
-	for (auto data : controller[conType::Pad]->GetCntData(_id))
+	(*controller[_id][input])();
+	for (auto data : controller[_id][input]->GetCntData(_id))
 	{
 		switch (data.first)
 		{
 		case InputID::Down:
-
 			if (data.second[static_cast<int>(Trg::Now)])
 			{
 				for (int i = 0; i < 2; i++)
@@ -390,7 +330,6 @@ void State::playerCtl(void)
 			{
 				puyomode_ = PuyoMode::直接落下;
 				dropSpeed_ = 16;
-
 			}
 			break;
 		default:
@@ -645,11 +584,13 @@ void State::Init(void)
 
 	overFlag_ = false;
 
-	controller.try_emplace(conType::Key, std::make_unique<KeyInput>());
-	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
-
-	controller[conType::Key]->SetUp(_id);
-	controller[conType::Pad]->SetUp(_id);
+	for (int i = 0; i < 2; i++)
+	{
+		controller[i].try_emplace(conType::Key, std::make_unique<KeyInput>());
+		controller[i][conType::Key]->SetUp(i);
+		controller[i].try_emplace(conType::Pad, std::make_unique<PadInput>());
+		controller[i][conType::Pad]->SetUp(i);
+	}
 
 	score_ = 0;
 	rennsaCnt_ = 0;
@@ -694,7 +635,11 @@ void State::Init(void)
 
 	puyoMode_.try_emplace(PuyoMode::落下, [&]() {
 		// 操作
-		playerCtl();
+		for (auto&& conType_ : conType())
+		{
+			playerCtl(conType_);
+
+		}
 		TRACE("落下\n");
 
 		// ぷよ全部回す

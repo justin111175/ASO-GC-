@@ -28,109 +28,28 @@ unique_Base TitleScene::Update(unique_Base own)
 
 	if (!FadeUpdate())
 	{
-		(*controller[conType::Key])();
-
-		for (auto data : controller[conType::Key]->GetCntData())
+		for (auto&& conType_ : conType())
 		{
-			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			if (TestCtl(conType_))
 			{
-				switch (data.first)
+				switch (meanID_)
 				{
-				case InputID::Up:
-
-					if (meanID_ <= TitleMean::一人プレイ)
-					{
-						meanID_ = TitleMean::ゲームオーバー;
-					}
-					else
-					{
-						meanID_ = (TitleMean)(static_cast<int>(meanID_) - 1);
-
-					}
+				case TitleMean::一人プレイ:
+					return std::make_unique<GameScene>();
 					break;
-				case InputID::Down:
-					if (meanID_ >= TitleMean::ゲームオーバー)
-					{
-						meanID_ = TitleMean::一人プレイ;
-					}
-					else
-					{
-						meanID_ = (TitleMean)(static_cast<int>(meanID_) + 1);
-
-					}
+				case TitleMean::二人プレイ:
+					return std::make_unique<GameScene2>();
 					break;
-				case InputID::Btn1:
-					switch (meanID_)
-					{
-					case TitleMean::一人プレイ:
-						return std::make_unique<GameScene>();
-						break;
-					case TitleMean::二人プレイ:
-						return std::make_unique<GameScene2>();
-						break;
-					case TitleMean::ゲームオーバー:
-						DxLib_End();
-						break;
-
-					}
-				}
-			}
-		}
-		(*controller[conType::Pad])();
-
-		for (auto data : controller[conType::Pad]->GetCntData(0))
-		{
-			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-			{
-				switch (data.first)
-				{
-				case InputID::Up:
-
-					if (meanID_ <= TitleMean::一人プレイ)
-					{
-						meanID_ = TitleMean::ゲームオーバー;
-					}
-					else
-					{
-						meanID_ = (TitleMean)(static_cast<int>(meanID_) - 1);
-
-					}
+				case TitleMean::ゲームオーバー:
+					DxLib_End();
 					break;
-				case InputID::Down:
-					if (meanID_ >= TitleMean::ゲームオーバー)
-					{
-						meanID_ = TitleMean::一人プレイ;
-					}
-					else
-					{
-						meanID_ = (TitleMean)(static_cast<int>(meanID_) + 1);
 
-					}
-					break;
-				case InputID::Btn1:
-					switch (meanID_)
-					{
-					case TitleMean::一人プレイ:
-						return std::make_unique<GameScene>();
-						break;
-					case TitleMean::二人プレイ:
-						return std::make_unique<GameScene2>();
-						break;
-					case TitleMean::ゲームオーバー:
-						DxLib_End();
-						break;
-
-					}
 				}
 			}
 		}
 
 	}
 			
-	
-
-
-
 
 
 	return std::move(own);
@@ -145,125 +64,82 @@ void TitleScene::BaseDraw(void)
 
 
 
+bool TitleScene::TestCtl(conType input)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		(*controller[i][input])();
+
+		for (auto data : controller[i][input]->GetCntData(i))
+		{
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+				switch (data.first)
+				{
+				case InputID::Up:
+
+					if (meanID_ <= TitleMean::一人プレイ)
+					{
+						meanID_ = TitleMean::ゲームオーバー;
+					}
+					else
+					{
+						meanID_ = (TitleMean)(static_cast<int>(meanID_) - 1);
+
+					}
+					break;
+				case InputID::Down:
+					if (meanID_ >= TitleMean::ゲームオーバー)
+					{
+						meanID_ = TitleMean::一人プレイ;
+					}
+					else
+					{
+						meanID_ = (TitleMean)(static_cast<int>(meanID_) + 1);
+
+					}
+					break;
+				case InputID::Btn1:
+					return true;
+
+				}
+			}
+		}
+	}
+	return false;
+}
+
 void TitleScene::Init(void)
 {
 	//controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
 	cnt_ = 0;
 
 
-	controller.emplace(conType::Key, std::make_unique<KeyInput>());
-	controller[conType::Key]->SetUp(0);
-	
-	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
-	controller[conType::Pad]->SetUp(0);
 
+	for (int i = 0; i < 2; i++)
+	{	
 
-	//controller[conType::Pad]->SetUp(_id);
+		controller[i].try_emplace( conType::Key, std::make_unique<KeyInput>());
+		controller[i][conType::Key]->SetUp(i);
+		controller[i].try_emplace(conType::Pad, std::make_unique<PadInput>());
+		controller[i][conType::Pad]->SetUp(i);
+		
+	}
+
 
 	IpImageMng.GetID("マーク", "image/mark.png", { 45,45 }, { 1,1 });
 	IpImageMng.GetID("BG", "image/BG.png", { 1280,800 }, { 1,1 });
 	IpImageMng.GetID("Frame", "image/frame.png", { 1280,800 }, { 1,1 });
 	IpImageMng.GetID("Main", "image/main.png", { 720,720 }, { 1,1 });
+	
+
+
 	meanID_ = TitleMean::一人プレイ;
 	Flag = false;
 
 }
 
-void TitleScene::MeanCtl(void)
-{
-	(*controller[conType::Key])();
 
-	for (auto data : controller[conType::Key]->GetCntData())
-	{
-		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-		{
-			switch (data.first)
-			{
-			case InputID::Up:
-
-				if (meanID_ <= TitleMean::一人プレイ)
-				{
-					meanID_ = TitleMean::ゲームオーバー;
-				}
-				else
-				{
-					meanID_ = (TitleMean)(static_cast<int>(meanID_) - 1);
-
-				}
-				break;
-			case InputID::Down:
-				if (meanID_ >= TitleMean::ゲームオーバー)
-				{
-					meanID_ = TitleMean::一人プレイ;
-				}
-				else
-				{
-					meanID_ = (TitleMean)(static_cast<int>(meanID_) + 1);
-
-				}
-				break;
-			case InputID::Btn1:
-				switch (meanID_)
-				{
-				case TitleMean::ゲームオーバー:
-					DxLib_End();
-					break;
-				default:
-					Flag = true;
-					break;
-				}
-				break;
-			}
-		}
-
-	}
-	(*controller[conType::Pad])();
-
-	for (auto data : controller[conType::Pad]->GetCntData(0))
-	{
-		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-		{
-			switch (data.first)
-			{
-			case InputID::Up:
-
-				if (meanID_ <= TitleMean::一人プレイ)
-				{
-					meanID_ = TitleMean::ゲームオーバー;
-				}
-				else
-				{
-					meanID_ = (TitleMean)(static_cast<int>(meanID_) - 1);
-
-				}
-				break;
-			case InputID::Down:
-				if (meanID_ >= TitleMean::ゲームオーバー)
-				{
-					meanID_ = TitleMean::一人プレイ;
-				}
-				else
-				{
-					meanID_ = (TitleMean)(static_cast<int>(meanID_) + 1);
-
-				}
-				break;
-			case InputID::Btn1:
-				switch (meanID_)
-				{
-				case TitleMean::ゲームオーバー:
-					DxLib_End();
-					break;
-				default:
-					Flag = true;
-					break;
-				}
-				break;
-			}
-		}
-	}
-
-}
 
 void TitleScene::Draw(void)
 {
@@ -287,6 +163,7 @@ void TitleScene::Draw(void)
 	DrawString(450, 350, "ゲーム終了", 0xFFFFFF);
 
 	DrawGraph(400+sin((double)IpSceneMng.frames()/5)*5, 243+ static_cast<int>(meanID_)*50, IMAGE_ID("マーク")[0], true);
+
 
 	if (IpSceneMng._blendCnt)
 	{

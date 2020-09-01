@@ -52,7 +52,7 @@ void NextPuyo::Draw(int color)
 
 
 		DrawBoxAA(nextPos_.x + 8 * 48, nextPos_.y + 48, nextPos_.x + 9 * 48, nextPos_.y + 3 * 48, 0xFFFFFF, false, 3.0f);
-		DrawBoxAA(nextPos_.x + 7 * 48, nextPos_.y + 48 + 24, nextPos_.x + 7 * 48, nextPos_.y + 3 * 48 + 24, 0xFFFFFF, false, 3.0f);
+		DrawBoxAA(nextPos_.x + 7 * 48, nextPos_.y + 48 + 24, nextPos_.x + 8 * 48, nextPos_.y + 3 * 48 + 24, 0xFFFFFF, false, 3.0f);
 
 	}
 
@@ -110,6 +110,7 @@ bool NextPuyo::Add(int no)
 		offset = { -48,24 };
 
 	}
+
 	for (auto puyoPair : nextPuyoList_)
 	{
 		puyoPair.first->Pos(std::move(pos1));

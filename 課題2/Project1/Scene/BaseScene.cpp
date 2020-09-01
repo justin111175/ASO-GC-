@@ -38,6 +38,27 @@ bool BaseScene::FadeUpdate(void)
 	return IpSceneMng._blendCnt;
 }
 
+bool BaseScene::MeanCtl(conType input)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		(*controller[i][input])();
+
+		for (auto data : controller[i][input]->GetCntData(i))
+		{
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+
+				if (data.first == InputID::Mean)
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 
 
 

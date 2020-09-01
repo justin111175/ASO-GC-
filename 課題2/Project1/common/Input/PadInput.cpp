@@ -45,20 +45,20 @@ bool PadInput::SetUp(int no)
 
 void PadInput::Updata(void)
 {
-
+		_keyData[0]= GetJoypadInputState(DX_INPUT_PAD1);
+		_keyData[1]= GetJoypadInputState(DX_INPUT_PAD2);
 	
-	_keyData[0]= GetJoypadInputState(DX_INPUT_PAD1);
-	//_keyData[1]= GetJoypadInputState(DX_INPUT_PAD2);
-
 	for (auto id : InputID())
 	{
-		_data[0][id][static_cast<int>(Trg::Old)] = _data[0][id][static_cast<int>(Trg::Now)];
-		_data[0][id][static_cast<int>(Trg::Now)] = _keyData[0] & _inputTbl[id];
+		for (int i = 0; i < 2; i++)
+		{
+			_data[i][id][static_cast<int>(Trg::Old)] = _data[i][id][static_cast<int>(Trg::Now)];
+			_data[i][id][static_cast<int>(Trg::Now)] = _keyData[i] & _inputTbl[id];
 		
-		//_data[1][id][static_cast<int>(Trg::Old)] = _data[1][id][static_cast<int>(Trg::Now)];
-		//_data[1][id][static_cast<int>(Trg::Now)] = _keyData[1] & _inputTbl[id];
 
+		}
 	}
+
 
 
 }

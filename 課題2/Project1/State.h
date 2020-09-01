@@ -50,10 +50,12 @@ public:
 	Vector2 _offset;												// 座標
 
 	const int GetID(void);
+	void ObjDraw(void);												// 一人のゲームシーン
+
 private:
 		
 	PuyoMode puyomode_;												// ぷよのモード		
-	void playerCtl(void);											// プレイヤー操作
+	void playerCtl(conType input);											// プレイヤー操作
 	bool downCheck(sharePuyo& puyo);								// ぷよの下のマスチェック
 
 	bool SetEraser(PuyoID id, Vector2 pos);							// 消すぷよチェック
@@ -65,7 +67,6 @@ private:
 
 	bool InstanceOjyamapuyo(void);									// インスタンスお邪魔ぷよ
 
-	void ObjDraw(void);												// 一人のゲームシーン
 
 	Permit_Data _pData;
 	Permit_Data _drawData;
@@ -73,7 +74,7 @@ private:
 	const char* name_;												// プレイヤーID
 
 
-	std::map<conType,std::unique_ptr<Controller>> controller;
+	std::map<conType,std::unique_ptr<Controller>> controller[2];
 
 
 	const int blockSize_;

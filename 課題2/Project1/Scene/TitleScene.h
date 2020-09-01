@@ -20,10 +20,10 @@ public:
 
 
 private:
+
+	bool TestCtl(conType input);
 	void Init(void);
 	TitleMean meanID_;
-
-	void MeanCtl(void);
 	void Draw(void);
 	bool Flag;
 	int cnt_;

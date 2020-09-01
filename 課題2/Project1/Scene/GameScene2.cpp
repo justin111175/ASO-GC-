@@ -8,6 +8,7 @@
 #include "EffectMng.h"
 #include "../common/ImageMng.h"
 #include "../common/Input/PadInput.h"
+#include "../common/Input/KeyInput.h"
 #include "MeanScene.h"
 #include "GameOverScene.h"
 
@@ -18,10 +19,14 @@ GameScene2::GameScene2()
 
 	playerState.emplace_back(std::make_unique<State>(std::move(Vector2(800, 50)), std::move(Vector2(700 + 800, 800))));
 	
-	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
+	for (int i = 0; i < 2; i++)
+	{
+		controller[i].try_emplace(conType::Key, std::make_unique<KeyInput>());
+		controller[i][conType::Key]->SetUp(i);
+		controller[i].try_emplace(conType::Pad, std::make_unique<PadInput>());
+		controller[i][conType::Pad]->SetUp(i);
 
-	controller[conType::Pad]->SetUp(0);
-
+	}
 	IpImageMng.GetID("space", "image/space.png", { 570,40 }, { 1,1 });
 	IpImageMng.GetID("勝負画像", "image/win.png", { 260,150 }, { 1,2 });
 
@@ -35,8 +40,6 @@ GameScene2::~GameScene2()
 
 unique_Base GameScene2::Update(unique_Base own)
 {
-
-
 	Draw();
 
 	// 無返事参照、const参照、shared_ptr三つの方法がある
@@ -53,39 +56,21 @@ unique_Base GameScene2::Update(unique_Base own)
 
 				}
 
-				if (state->sceneFlag_)
-				{
-					return std::make_unique<TitleScene>();
-
-				}
 				if (state->overFlag_)
 				{
-					return std::make_unique<GameOverScene>(std::move(own), playerState.size());
+					return std::make_unique<GameOverScene>(std::move(own), playerState);
 				}
-
 			}
 		}
-	}
-	(*controller[conType::Pad])();
-
-	for (auto data : controller[conType::Pad]->GetCntData(0))
-	{
-		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+		for (auto&& conType_ : conType())
 		{
-
-			if (data.first == InputID::Mean)
+			if (MeanCtl(conType_))
 			{
 				return std::make_unique<MeanScene>(std::move(own));
 			}
 		}
 	}
-
-
 	IpEffect.Updata();
-
-
-
-
 	return std::move(own);
 }
 
@@ -95,10 +80,12 @@ void GameScene2::BaseDraw(void)
 {
 	DrawGraph(0, 0, IMAGE_ID("BG")[0], true);
 
+
 	for (auto&& state : playerState)
 	{
 		state->Draw();
 	}
+
 
 
 
@@ -107,42 +94,6 @@ void GameScene2::BaseDraw(void)
 	for (auto&& state : playerState)
 	{
 		DrawGraph(0, 0,state->GetScreenId(), true);
-	}
-
-	//DrawGraph(0, 0, playerState[0]->GetScreenId(), true);
-
-	//DrawGraph(0, 0, playerState[1]->GetScreenId(), true);
-
-	for (auto&& state : playerState)
-	{
-		if (state->overFlag_)
-		{
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
-			DrawGraph(350, 500, IMAGE_ID("space")[0], true);
-
-			SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
-		}
-	}
-
-	if (overFlag_)
-	{
-
-		SetFontSize(50);
-
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 125);
-		DrawBox(0, 0, IpSceneMng.ScreenSize.x, IpSceneMng.ScreenSize.y, 0x000000, true);
-		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
-
-		for (auto&& state : playerState)
-		{
-			DrawGraph(state->_offset.x + 60, state->_offset.y + 200, IMAGE_ID("勝負画像")[static_cast<int>(state->winFlag_)], true);
-
-		}
-
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sin((double)IpSceneMng.frames() / 10) * 250);
-		DrawGraph(350, 500, IMAGE_ID("space")[0], true);
-
-		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 	}
 
 

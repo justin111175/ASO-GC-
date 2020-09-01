@@ -1,12 +1,11 @@
 #include "SceneMng.h"
 #include "common/Vector2.h"
-#include "GameScene.h"
-#include "TitleScene.h"
 #include "common/TimeCount.h"
 #include <time.h>
 #include "common/_debug/_DebugDispOut.h"
 #include "EffectMng.h"
 #include <EffekseerForDxlib.h>
+#include "CtlScene.h"
 
 SceneMng* SceneMng::sInstance = nullptr;
 
@@ -19,7 +18,7 @@ void SceneMng::Run(void)
 		//AST();
 	}
 
-	_activeScene = std::make_unique<TitleScene>();
+	_activeScene = std::make_unique<CtlScene>();
 
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{

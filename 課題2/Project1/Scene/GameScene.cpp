@@ -8,6 +8,7 @@
 #include "EffectMng.h"
 #include "../common/ImageMng.h"
 #include "../common/Input/PadInput.h"
+#include "../common/Input/KeyInput.h"
 #include "MeanScene.h"
 #include "GameOverScene.h"
 
@@ -19,8 +20,14 @@ GameScene::GameScene()
 	IpImageMng.GetID("space", "image/space.png", { 570,40 }, { 1,1 });
 	IpImageMng.GetID("X", "image/X.png", { 57,57 }, { 1,1 });
 
-	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
-	controller[conType::Pad]->SetUp(0);
+	for (int i = 0; i < 2; i++)
+	{
+		controller[i].try_emplace(conType::Key, std::make_unique<KeyInput>());
+		controller[i][conType::Key]->SetUp(i);
+		controller[i].try_emplace(conType::Pad, std::make_unique<PadInput>());
+		controller[i][conType::Pad]->SetUp(i);
+
+	}
 
 
 	overFlag_ = false;
@@ -49,23 +56,20 @@ unique_Base GameScene::Update(unique_Base own)
 
 			if (state->overFlag_)
 			{
-				return std::make_unique<GameOverScene>(std::move(own), playerState.size());
+				return std::make_unique<GameOverScene>(std::move(own));
 			}
 		}
-	}
-	(*controller[conType::Pad])();
-
-	for (auto data : controller[conType::Pad]->GetCntData(0))
-	{
-		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+		for (auto&& conType_ : conType())
 		{
 
-			if (data.first == InputID::Mean)
+			if (MeanCtl(conType_))
 			{
 				return std::make_unique<MeanScene>(std::move(own));
 			}
+
 		}
 	}
+
 	IpEffect.Updata();
 	return std::move(own);
 }
@@ -85,6 +89,8 @@ void GameScene::BaseDraw(void)
 
 	DrawGraph(0, 0, playerState[0]->GetScreenId(), true);
 }
+
+
 
 void GameScene::Draw(void)
 {

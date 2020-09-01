@@ -3,13 +3,21 @@
 #include <Dxlib.h>
 #include "TitleScene.h"
 #include "../common/Input/PadInput.h"
-
-
+#include "../common/Input/KeyInput.h"
+#include "CheckScene.h"
+#include "SceneMng.h"
 MeanScene::MeanScene(unique_Base own)
 {
     childScene_ = std::move(own);
-	controller.try_emplace(conType::Pad, std::make_unique<PadInput>());
-	controller[conType::Pad]->SetUp(0);
+	for (int i = 0; i < 2; i++)
+	{
+		controller[i].try_emplace(conType::Key, std::make_unique<KeyInput>());
+		controller[i][conType::Key]->SetUp(i);
+		controller[i].try_emplace(conType::Pad, std::make_unique<PadInput>());
+		controller[i][conType::Pad]->SetUp(i);
+
+	}
+	cnt_ = 0;
 
 }
 
@@ -19,58 +27,46 @@ MeanScene::~MeanScene()
 
 unique_Base MeanScene::Update(unique_Base own)
 {
-	(*controller[conType::Pad])();
 
-	for (auto data : controller[conType::Pad]->GetCntData(0))
+	if (cnt_ < 125)
 	{
-		if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
-		{
-
-			switch (data.first)
-			{
-			case InputID::Up:
-				if (gameMean_ <= GameMean::タイトルに戻る)
-				{
-					gameMean_ = GameMean::ゲーム終了;
-				}
-				else
-				{
-					gameMean_ = (GameMean)(static_cast<int>(gameMean_) - 1);
-
-				}
-				break;
-			case InputID::Down:
-				if (gameMean_ >= GameMean::ゲーム終了)
-				{
-					gameMean_ = GameMean::タイトルに戻る;
-				}
-				else
-				{
-					gameMean_ = (GameMean)(static_cast<int>(gameMean_) + 1);
-
-				}
-				break;
-			case InputID::Btn2:
-				return childScene_->Update(std::move(childScene_));
-				break;
-			case InputID::Btn1:
-				switch (gameMean_)
-				{
-				case GameMean::タイトルに戻る:
-					return std::make_unique<TitleScene>();
-					break;
-				case GameMean::ゲームに戻る:
-					_timeCount.Set("待つ", true, 1);
-					return childScene_->Update(std::move(childScene_));
-					break;
-				case GameMean::ゲーム終了:
-					DxLib_End();
-					break;
-				}
-				break;			
-			}		
-		}
+		cnt_+=5;
+		
 	}
+	else
+	{
+		for (auto&& conType_ : conType())
+		{
+			if (MeanCtl(conType_))
+			{
+				if (key_ == 1)
+				{
+					switch (gameMean_)
+					{
+					case GameMean::タイトルに戻る:
+						return std::make_unique<CheckScene>(std::move(childScene_));
+						break;
+					case GameMean::ゲームに戻る:
+						_timeCount.Set("待つ", true, 1);
+						return childScene_->Update(std::move(childScene_));
+						break;
+					case GameMean::ゲーム終了:
+						DxLib_End();
+						break;
+					}
+				}
+				else
+				{
+					return childScene_->Update(std::move(childScene_));
+
+				}
+
+			}
+		}
+
+	}
+	
+
 	BaseDraw();
 	return std::move(own);
 }
@@ -81,6 +77,12 @@ void MeanScene::BaseDraw(void)
 {
 	ClsDrawScreen();
 	childScene_->BaseDraw();
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, cnt_);
+	DrawBox(0, 0, IpSceneMng.ScreenSize.x, IpSceneMng.ScreenSize.y, 0x000000, true);
+	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
+
+
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
 	DrawBox(400, 200, 900, 500, 0x000000, true);
@@ -100,6 +102,58 @@ void MeanScene::BaseDraw(void)
 	DrawString(420, 320, "ゲームに戻る", 0xFFFFFF);
 	DrawString(420, 370, "ゲーム終了", 0xFFFFFF);
 	ScreenFlip();
+}
+
+bool MeanScene::MeanCtl(conType input)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		(*controller[i][input])();
+
+		for (auto data : controller[i][input]->GetCntData(i))
+		{
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+
+				switch (data.first)
+				{
+				case InputID::Up:
+					if (gameMean_ <= GameMean::タイトルに戻る)
+					{
+						gameMean_ = GameMean::ゲーム終了;
+					}
+					else
+					{
+						gameMean_ = (GameMean)(static_cast<int>(gameMean_) - 1);
+
+					}
+					break;
+				case InputID::Down:
+					if (gameMean_ >= GameMean::ゲーム終了)
+					{
+						gameMean_ = GameMean::タイトルに戻る;
+					}
+					else
+					{
+						gameMean_ = (GameMean)(static_cast<int>(gameMean_) + 1);
+
+					}
+					break;
+				case InputID::Btn1:
+					key_ = 1;
+					return true;
+					break;
+
+				case InputID::Btn2:
+					key_ = 2;
+					return true;
+					break;
+				}
+			}
+		}
+	}
+	return false;
+
 }
 
 

@@ -15,13 +15,11 @@ bool KeyInput::SetUp(int no)
 			{InputID::Down,KEY_INPUT_S},
 			{InputID::Left,KEY_INPUT_A},
 			{InputID::Right,KEY_INPUT_D},
-			{InputID::Btn1,KEY_INPUT_V},
-			{InputID::Btn2,KEY_INPUT_B},
-			{InputID::テスト用,KEY_INPUT_T}
-
+			{InputID::Btn1,KEY_INPUT_C},
+			{InputID::Btn2,KEY_INPUT_V},
+			{InputID::Btn3,KEY_INPUT_B},
+			{InputID::Mean,KEY_INPUT_SPACE}
 		};
-
-
 	}
 	else
 	{		
@@ -30,29 +28,28 @@ bool KeyInput::SetUp(int no)
 			{InputID::Down,KEY_INPUT_DOWN},
 			{InputID::Left,KEY_INPUT_LEFT},
 			{InputID::Right,KEY_INPUT_RIGHT},	
-			{InputID::Btn1,KEY_INPUT_M},
-			{InputID::Btn2,KEY_INPUT_N},
-			{InputID::テスト用,KEY_INPUT_T}
-
-
+			{InputID::Btn1,KEY_INPUT_COMMA},
+			{InputID::Btn2,KEY_INPUT_M},
+			{InputID::Btn3,KEY_INPUT_N},
+			{InputID::Mean,KEY_INPUT_SPACE}
 		};
+
 	}
-
-
-
 
 	return true;
 }
 
 void KeyInput::Updata(void)
 {
+	GetHitKeyStateAll(_keyData[0].data());
+	GetHitKeyStateAll(_keyData[1].data());
 
-	GetHitKeyStateAll(_keyData.data());
-	
 	for (auto id : InputID())
 	{
-		_dataKey[id][static_cast<int>(Trg::Old)] = _dataKey[id][static_cast<int>(Trg::Now)];
-		_dataKey[id][static_cast<int>(Trg::Now)] = _keyData[_inputTbl[id]];
+		for (int i = 0; i < 2; i++)
+		{
+			_data[i][id][static_cast<int>(Trg::Old)] = _data[i][id][static_cast<int>(Trg::Now)];
+			_data[i][id][static_cast<int>(Trg::Now)] = _keyData[i][_inputTbl[id]];
+		}
 	}
-
 }
