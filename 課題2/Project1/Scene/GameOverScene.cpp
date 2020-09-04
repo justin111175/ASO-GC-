@@ -17,6 +17,28 @@ GameOverScene::GameOverScene(unique_Base own, std::vector <std::unique_ptr<State
 	Init();
 }
 
+GameOverScene::GameOverScene(unique_Base own, std::vector<std::unique_ptr<State>>& playerState, int no)
+{
+
+	childScene_ = std::move(own);
+
+	playerState_ = std::move(playerState);
+
+	playerSize_ = 2;
+	if (no <= 0)
+	{
+		if (playerState_[0]->GetScroe() > playerState_[1]->GetScroe())
+		{
+			playerState_[1]->winFlag_ = false;
+		}
+		else
+		{
+			playerState_[0]->winFlag_ = false;
+		}
+	}
+	Init();
+}
+
 GameOverScene::GameOverScene(unique_Base own)
 {
 

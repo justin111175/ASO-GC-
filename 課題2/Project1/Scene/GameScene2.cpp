@@ -29,7 +29,10 @@ GameScene2::GameScene2()
 	}
 	IpImageMng.GetID("space", "image/space.png", { 570,40 }, { 1,1 });
 	IpImageMng.GetID("勝負画像", "image/win.png", { 260,150 }, { 1,2 });
+	IpImageMng.GetID("X", "image/X.png", { 57,57 }, { 1,1 });
 
+	number_.Init();
+	Cnt_ = 180;
 }
 
 
@@ -45,22 +48,44 @@ unique_Base GameScene2::Update(unique_Base own)
 	// 無返事参照、const参照、shared_ptr三つの方法がある
 	if (!FadeUpdate())
 	{
-		if (!meanFlag_)
+		if (IpSceneMng.frames() % 60 == 1)
 		{
-			for (auto&& state : playerState)
+			Cnt_--;
+		}
+		//if (!meanFlag_)
+		{
+			if (Cnt_ > 0)
 			{
-
-				if (!_timeCount.GetFlag("待つ"))
+				for (auto&& state : playerState)
 				{
-					state->Run();
 
-				}
+					if (!_timeCount.GetFlag("待つ"))
+					{
+						state->Run();
 
-				if (state->overFlag_)
-				{
-					return std::make_unique<GameOverScene>(std::move(own), playerState);
+					}
+
+					if (state->overFlag_)
+					{
+						return std::make_unique<GameOverScene>(std::move(own), playerState);
+					}
+
+					//if (playerState[0]->GetRennsaCnt() > 1)
+					//{
+					//	playerState[1]->OjyamaCnt(playerState[0]->GetRennsaCnt());
+					//}
+
+					//if (playerState[1]->GetRennsaCnt() > 1)
+					//{
+					//	playerState[0]->OjyamaCnt(playerState[1]->GetRennsaCnt());
+					//}
 				}
 			}
+			else
+			{
+				return std::make_unique<GameOverScene>(std::move(own), playerState,Cnt_);
+			}
+
 		}
 		for (auto&& conType_ : conType())
 		{
@@ -86,9 +111,6 @@ void GameScene2::BaseDraw(void)
 		state->Draw();
 	}
 
-
-
-
 	SetDrawScreen(DX_SCREEN_BACK);
 
 	for (auto&& state : playerState)
@@ -105,6 +127,7 @@ void GameScene2::Draw(void)
 
 
 	BaseDraw();
+	number_.Draw({ 650,400 }, { 1.0f,1.0f }, Cnt_);
 	IpEffect.Draw();
 
 	if (IpSceneMng._blendCnt)

@@ -8,6 +8,7 @@ class GameOverScene :
 public:
 
     GameOverScene(unique_Base own, std::vector <std::unique_ptr<State>>& playerState);
+    GameOverScene(unique_Base own, std::vector <std::unique_ptr<State>>& playerState,int no);
     GameOverScene(unique_Base own);
     ~GameOverScene();
     

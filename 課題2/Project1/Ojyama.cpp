@@ -34,6 +34,13 @@ void Ojyama::Draw(Vector2 offset)
 
 }
 
+bool Ojyama::SetPData(DirBit dirbit)
+{
+	_pDataOld = _pData;
+	_pData._bit = dirbit;
+	return true;
+}
+
 const Vector2 Ojyama::GetGrid(int size)
 {
 	return Vector2{ pos_.x / size,(pos_.y) / size };

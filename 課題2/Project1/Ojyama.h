@@ -9,12 +9,15 @@ public:
 	~Ojyama();
 	bool Run(int no);
 	void Draw(Vector2 offset);
+	bool SetPData(DirBit dirbit);						// ˆÚ“®§ŒÀ
 
 	virtual const Vector2 GetGrid(int size);
 
 	const PuyoID& ID(void);
 	bool Pos(Vector2 pos);
 	Permit_Data _pData;
+	Permit_Data _pDataOld;
+
 	Permit_Data _drawData;
 	
 	const bool& Alive(void);

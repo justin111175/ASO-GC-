@@ -87,16 +87,16 @@ void MeanScene::BaseDraw(void)
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
 	DrawBox(400, 200, 900, 500, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
-	DrawBoxAA(400, 200, 900, 500, 0xFFFFFF, false, 3.0f);
+	DrawBoxAA(400.0f, 200.0f, 900.0f, 500.0f, 0xFFFFFF, false, 3.0f);
 
 	SetFontSize(50);
 	DrawString(400, 200, "メニュー", 0xFFFFFF);
-	DrawBoxAA(400, 200, 900, 250, 0xFFFFFF, false, 3.0f);
+	DrawBoxAA(400.0f, 200.0f, 900.0f, 250.0f, 0xFFFFFF, false, 3.0f);
 
 	SetFontSize(30);
 
 	DrawBox(420, 270 + static_cast<int>(gameMean_) * 50, 660, 310 + static_cast<int>(gameMean_) * 50, 0x000000, true);
-	DrawBoxAA(420, 270 + static_cast<int>(gameMean_) * 50, 660, 310 + static_cast<int>(gameMean_) * 50, 0xFFFFFF, false, 3.0f);
+	DrawBoxAA(420.0f, 270.0f + static_cast<int>(gameMean_) * 50, 660.0f, 310.0f + static_cast<int>(gameMean_) * 50, 0xFFFFFF, false, 3.0f);
 
 	DrawString(420, 270, "タイトルに戻る", 0xFFFFFF);
 	DrawString(420, 320, "ゲームに戻る", 0xFFFFFF);

@@ -28,8 +28,6 @@ enum class PlayState
 	MAX
 };
 
-
-
 using sharedOjyama = std::shared_ptr<Ojyama>;
 
 class State
@@ -51,7 +49,11 @@ public:
 
 	const int GetID(void);
 	void ObjDraw(void);												// 一人のゲームシーン
+	const int GetRennsaCnt(void);
+	bool InstanceOjyamapuyo(void);									// インスタンスお邪魔ぷよ
 
+	int OjyamaCnt(int Cnt);
+	int GetScroe(void);
 private:
 		
 	PuyoMode puyomode_;												// ぷよのモード		
@@ -65,7 +67,6 @@ private:
 	void delPuyo(void);												// ぷよ消す
 	bool InstancePuyo(void);										// インスタンスぷよ
 
-	bool InstanceOjyamapuyo(void);									// インスタンスお邪魔ぷよ
 
 
 	Permit_Data _pData;
@@ -96,6 +97,7 @@ private:
 
 	Vector2 _size;
 	static int _stateCount;
+	int ojyamaCnt_;
 	int _id;
 	int _color;
 	int _color2;

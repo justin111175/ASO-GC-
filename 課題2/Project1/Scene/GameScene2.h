@@ -5,7 +5,7 @@
 #include "State.h"
 #include <memory>
 #include <Vector>
-
+#include "../common/Number.h"
 class GameScene2 :
 	public BaseScene
 {
@@ -17,7 +17,8 @@ public:
 
 private:
 	void Draw(void);
-
+	Number number_;
 	std::vector <std::unique_ptr<State>> playerState;
 
+	int Cnt_;
 };

@@ -66,20 +66,7 @@ void State::Draw(void)
 		
 	ObjDraw();
 
-	// スコア表示する
-	if (!_timeCount.GetFlag("連鎖"))
-	{
-		// 連鎖モードじゃない時、スコアを表示する
-		number_.Draw({ _offset.x+ blockSize_*7,_offset.y+ blockSize_*13+10 }, { 1.0f,1.0f }, scoreOld_);
 
-	}
-	else
-	{
-		// 連鎖モードの時、100＊連鎖数を表示する
-		number_.Draw({ _offset.x + blockSize_ * 7 + 10,_offset.y + blockSize_ * 13 + 5 }, { 1.0f,1.0f }, rennsaCnt_);
-		DrawRotaGraph3(_offset.x + blockSize_ * 5 + 10, _offset.y + blockSize_ * 13 + 5,0,0,1.0f,0.9f,0, IMAGE_ID("X")[0], true);
-		number_.Draw({ _offset.x + blockSize_ * 3 + 10,_offset.y + blockSize_ * 13 + 5 }, { 1.0f,1.0f }, 100);
-	}
 
 }
 
@@ -94,11 +81,11 @@ void State::ObjDraw(void)
 
 	SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 
-	DrawBoxAA(_offset.x, _offset.y, _offset.x + (gridMax.x) * blockSize_, _offset.y + (gridMax.y) * blockSize_, 0xFFFFFF, false, 3.0f);
+	DrawBoxAA((float)_offset.x, (float)_offset.y, (float)_offset.x + (gridMax.x) * blockSize_, (float)_offset.y + (gridMax.y) * blockSize_, 0xFFFFFF, false, 3.0f);
 
 	DrawBox(_offset.x + blockSize_, _offset.y + blockSize_, _offset.x + (gridMax.x - 1) * blockSize_, _offset.y + (gridMax.y - 1) * blockSize_, _color, true);
 
-	DrawBoxAA(_offset.x + blockSize_, _offset.y + blockSize_, _offset.x + (gridMax.x - 1) * blockSize_, _offset.y + (gridMax.y - 1) * blockSize_, 0xFFFFFF, false, 3.0f);
+	DrawBoxAA((float)_offset.x + blockSize_, (float)_offset.y + blockSize_, (float)_offset.x + (gridMax.x - 1) * blockSize_, (float)_offset.y + (gridMax.y - 1) * blockSize_, 0xFFFFFF, false, 3.0f);
 
 	SetFontSize(30);
 
@@ -106,8 +93,8 @@ void State::ObjDraw(void)
 	for (auto&& puyo : _puyo)
 	{
 		puyo->Draw(_offset);
-		DrawString(_offset.x + _puyo[0]->Pos().x, _offset.y + _puyo[0]->Pos().y, "0", 0xFFFFFF, true);
-		DrawString(_offset.x + _puyo[1]->Pos().x, _offset.y + _puyo[1]->Pos().y, "1", 0xFFFFFF, true);
+		//DrawString(_offset.x + _puyo[0]->Pos().x, _offset.y + _puyo[0]->Pos().y, "0", 0xFFFFFF, true);
+		//DrawString(_offset.x + _puyo[1]->Pos().x, _offset.y + _puyo[1]->Pos().y, "1", 0xFFFFFF, true);
 	}
 	//for (int x = 1; x < gridMax.x - 1; x++)
 	//{
@@ -144,16 +131,34 @@ void State::ObjDraw(void)
 	{
 		ojyama->Draw(_offset);
 	}
+	// スコア表示する
+	if (!_timeCount.GetFlag("連鎖"))
+	{
+		// 連鎖モードじゃない時、スコアを表示する
+		number_.Draw({ _offset.x + blockSize_ * 7,_offset.y + blockSize_ * 13 + 10 }, { 1.0f,1.0f }, scoreOld_);
 
+	}
+	else
+	{
+		// 連鎖モードの時、100＊連鎖数を表示する
+		number_.Draw({ _offset.x + blockSize_ * 7 + 10,_offset.y + blockSize_ * 13 + 5 }, { 1.0f,1.0f }, rennsaCnt_);
+		DrawRotaGraph3(_offset.x + blockSize_ * 5 + 10, _offset.y + blockSize_ * 13 + 5, 0, 0, 1.0f, 0.9f, 0, IMAGE_ID("X")[0], true);
+		number_.Draw({ _offset.x + blockSize_ * 3 + 10,_offset.y + blockSize_ * 13 + 5 }, { 1.0f,1.0f }, 100);
+	}
 	SetFontSize(50);
 
 	if (rennsaFlag_)
 	{
 		// 連鎖の時、連鎖数表示する
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, _timeCount.GetCnt("連鎖"));
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)_timeCount.GetCnt("連鎖"));
 		DrawFormatString(_offset.x + blockSize_ * 3, _offset.y + blockSize_ * 6, 0xFFFFFF, "%d連鎖", rennsaCnt_);
 		SetDrawBlendMode(DX_BLENDGRAPHTYPE_NORMAL, 0);
 	}
+}
+
+const int State::GetRennsaCnt(void)
+{
+	return rennsaCnt_;
 }
 
 
@@ -297,6 +302,8 @@ void State::playerCtl(conType input)
 				return true;
 			}
 		}
+		return false;
+
 
 	};
 	
@@ -330,6 +337,12 @@ void State::playerCtl(conType input)
 			{
 				puyomode_ = PuyoMode::直接落下;
 				dropSpeed_ = 16;
+			}
+			break;
+		case InputID::テスト用:
+			if (data.second[static_cast<int>(Trg::Now)] && !data.second[static_cast<int>(Trg::Old)])
+			{
+				InstanceOjyamapuyo();
 			}
 			break;
 		default:
@@ -413,10 +426,33 @@ bool State::InstancePuyo(void)
 // インスタンスお邪魔ぷよ
 bool State::InstanceOjyamapuyo(void)
 {
-	Vector2 pos_ = { gridMax.x / 2 * blockSize_,blockSize_ };
-	_ojyama.emplace(_ojyama.begin(), std::make_shared<Ojyama>(std::move(pos_), PuyoID::お邪魔ぷよ));
-	return true;
+	//if (!rennsaFlag_)
+	{
+		//int cnt_ = 1;
 
+		Vector2 pos_ = { 1 * blockSize_,blockSize_ };
+		_ojyama.emplace(_ojyama.begin(), std::make_shared<Ojyama>(std::move(pos_), PuyoID::お邪魔ぷよ));
+	
+			return true;
+
+		
+
+
+		
+
+	}
+
+
+}
+
+int State::OjyamaCnt(int Cnt)
+{
+	return ojyamaCnt_;
+}
+
+int State::GetScroe(void)
+{
+	return score_;
 }
 
 // 消すぷよチェック
@@ -669,6 +705,19 @@ void State::Init(void)
 	puyoMode_.try_emplace(PuyoMode::直接落下, [&]() {
 		TRACE("直接落下\n");
 
+		auto Check = [&](sharedOjyama& ojyama) {
+			auto pos = ojyama->GetGrid(blockSize_);
+			if (_data[(__int64)pos.y + 1][pos.x] != PuyoID::NON)
+			{
+				ojyama->Pos(pos * blockSize_);
+				_pData._bit.DOWN = 0;
+				_data[pos.y][pos.x] = PuyoID::お邪魔ぷよ;
+			}
+			else
+			{
+				return false;
+			}
+		};
 		// ぷよ全部回す
 		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 			// 落ちる
@@ -692,12 +741,21 @@ void State::Init(void)
 			}
 		});
 
+		std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
+
+			ojyama->Run(dropSpeed_);
+
+		});
+
 		// 落ちっていたぷよがない場合、全部のぷよをもう一度確認、大丈夫です。ならぷよんモードに行く
 		bool Flag = true;
 		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 
 			return Flag &= downCheck(puyo);
 		});
+
+
+
 
 		if (Flag)
 		{
@@ -729,23 +787,19 @@ void State::Init(void)
 
 		bool rennsaFlag = true;
 
-		//std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
 
-		//	return rennsaFlag &= Check(ojyama);
-		//});
 
-		//std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
 
-		//	if (!ojyama->Run(dropSpeed_))
-		//	{
-		//		rennsaFlag = false;
-		//	}
-		//});
 
 		// 全部のぷよ下チェックがtrueなら、消すモードに行く、一つがfalseなら、また直接落下モードに行く
 		std::for_each(_puyo.rbegin(), _puyo.rend(), [&](sharePuyo& puyo) {
 			return rennsaFlag &= downCheck(puyo);
 
+		});
+
+		std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
+
+			return rennsaFlag &= Check(ojyama);
 		});
 
 		if (rennsaFlag)
@@ -943,6 +997,7 @@ void State::Init(void)
 				_pData._bit.DOWN = 0;
 
 				_data[pos.y][pos.x] = PuyoID::お邪魔ぷよ;
+				return true;
 
 			}
 			else
@@ -952,40 +1007,40 @@ void State::Init(void)
 		};
 
 
-		bool rennsaFlag = true;
-
 		std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
-
-			return rennsaFlag &= Check(ojyama);
-		});
-
-		std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
-
-			if (!ojyama->Run(8))
+			// 落ちる
+			ojyama->Run(dropSpeed_);
 			{
-				rennsaFlag = false;
+				// 落ちるかどうかチェック
+				if (Check(ojyama))
+				{
+					// ぷよの下にはぷよあるいは壁がある場合、ぷよんの設定
+					auto pos = ojyama->GetGrid(blockSize_);
+					_pData._bit = { 0,0,0,0 };
+					ojyama->SetPData(_pData._bit);
+					// 落ちっていたぷよ
+					if (!ojyama->_pData._bit.DOWN && ojyama->_pDataOld._bit.DOWN)
+					{
+						dropSpeed_ = 16;
+						PuyoCheck(pos);
+						puyomode_ = PuyoMode::ぷよ;
+					}
+				}
 			}
-
-
-
-
 		});
+
+		// 落ちっていたぷよがない場合、全部のぷよをもう一度確認、大丈夫です。ならぷよんモードに行く
+		bool Flag = true;
 
 		std::for_each(_ojyama.rbegin(), _ojyama.rend(), [&](sharedOjyama& ojyama) {
 
-			return rennsaFlag &= Check(ojyama);
+			return Flag &= Check(ojyama);
 		});
 
-
-		if (rennsaFlag)
+		if (Flag)
 		{
-
 			puyomode_ = PuyoMode::オーバーチェック;
-
 		}
-
-
-
 
 
 	});
@@ -1002,7 +1057,7 @@ void State::Init(void)
 			auto pos = puyo->GetGrid(blockSize_);
 			if (pos.y <= 1)
 			{
-				return Flag = true;
+				Flag = true;
 			}
 		});
 
@@ -1010,6 +1065,7 @@ void State::Init(void)
 		if (!Flag)
 		{
 			InstancePuyo();
+			//InstanceOjyamapuyo(ojyamaCnt_);
 			if (rennsaCnt_ > 0 && !_timeCount.GetFlag("連鎖"))
 			{
 				rennsaCnt_ = 0;
